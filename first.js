@@ -135,7 +135,7 @@ loop = function() {
   context.fillStyle = "#ffffff";
   context.font = "25px Arial";
   context.fillText("Level " + level, w_canvas-120, 40);
-  context.fillText("Coord: " + rectangle.x + " " + rectangle.y, w_canvas-400, 80);
+  context.fillText("Coord: " + parseInt(rectangle.x) + " " + parseInt(rectangle.y), w_canvas-400, 80);
   // call update when the browser is ready to draw again
   window.requestAnimationFrame(loop);
 
