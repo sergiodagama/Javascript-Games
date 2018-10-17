@@ -6,6 +6,7 @@ var level = 0, max_obstacles = 5, obs_width = 100;
 var obs_x = new Array(); 
 var obs_y = new Array();
 var endObs = false;
+var obstacles = [];
 
 context = document.querySelector("canvas").getContext("2d");
 
@@ -117,11 +118,13 @@ loop = function() {
   context.stroke();
   //Obstacles
   context.fillStyle = "#af4112";
-  var i;
-  for (i = 0; i < max_obstacles; i++){
-      obs_x[i] = (120 + (100*i));
-      obs_y[i] = (300 - (50*i));
-      context.fillRect(obs_x[i], obs_y[i], obs_width, 20);
+
+  for (var i = 0; i < 5; i++){
+      topleftx = (120 + (100*i));
+      toplefty = (300 - (50*i));
+      let rectangle = new Rectangle(topleftx, toplefty, topleftx + 100, toplefty + 20);
+      rectangle.DrawObject();
+      obstacles[i] = rectangle;
   }
   //Collision detection for obstacles
 /*  for (i = 0; i < max_obstacles; i++){
@@ -144,3 +147,23 @@ loop = function() {
 window.addEventListener("keydown", controller.keyListener)
 window.addEventListener("keyup", controller.keyListener);
 window.requestAnimationFrame(loop);
+
+class Rectangle {
+
+  constructor(x1, y1, x2, y2){
+
+    this.x1 = x1;
+    this.y1 = y1
+    this.x2 = x2;
+    this.y2 = y2;
+
+  }
+
+  DrawObject(){
+    context.fillStyle = "#af4112";
+    context.fillRect(this.x1, this.y1, this.x2 - this.x1, this.y2 - this.y1);
+
+  }
+
+  ObjectCollision
+}
