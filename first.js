@@ -163,14 +163,6 @@ loop = function () {
 	rectangle.x_velocity *= 0.9;// friction
 	rectangle.y_velocity *= 0.9;// friction
 
-	/*// if rectangle is falling below floor line
-	if (rectangle.y > h_canvas - h_floor - 37) {
-
-		rectangle.jumping = false;
-		rectangle.y = h_canvas - h_floor - 37;
-		rectangle.y_velocity = 0;
-	}*/
-
 	//Collision against the random obstacles
 	//missing code
 	if (level == 0 && rectangle.x < 0) {
