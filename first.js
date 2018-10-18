@@ -8,7 +8,7 @@ var obs_y = new Array();
 var endObs = false;
 var obstacles = [];
 var bitlevel;
-var precision = 4; //Related to how velocities work and changed the position. The coord cannot be altered by more than 1.5 it seems
+var precision = 2; //Related to how velocities work and changed the position. The coord cannot be altered by more than 1.5 it seems
 
 class Rectangle {
 
@@ -31,9 +31,9 @@ class Rectangle {
 
 class Level {
 
-	constructor(obstaclesarray, width, height) {
+	constructor(obstaclesarray) {
 		this.obstaclesarray = obstaclesarray;
-		this.bitmap = this.MakeBitMap(width, height);
+		this.bitmap = this.MakeBitMap();
 	}
 
 	DrawLevel() { //Draws all the objects from the level
@@ -42,13 +42,13 @@ class Level {
 		}
 	}
 
-	MakeBitMap(bit_width, bit_height) {
+	MakeBitMap() {
 
 		//Creates a bit map width * height
 		var bitmap = [];
-		for (var i = 0; i < bit_height; i++) {
+		for (var i = 0; i < h_canvas; i++) {
 			let line_bitmap = [];
-			for (var j = 0; j < bit_width; j++) {
+			for (var j = 0; j < w_canvas; j++) {
 				line_bitmap.push(0);
 			}
 			bitmap.push(line_bitmap);
@@ -63,6 +63,14 @@ class Level {
 			}
 		}
 
+		//Makes the ground of the bit map
+		for (var i = 0; i < 20; i++) { //Has 5 of thickness in the bit map
+			for (var j = 0; j < w_canvas; j++) {
+
+				bitmap[h_canvas - h_floor - 8 + i][j] = 1;
+			}
+		}
+
 		return bitmap;
 	}
 
@@ -73,15 +81,7 @@ context = document.querySelector("canvas").getContext("2d");
 context.canvas.height = h_canvas;
 context.canvas.width = w_canvas;
 
-
-//Level 0 and initializes the bitlevel as level 0
-for (var i = 0; i < 5; i++) {
-	topleftx = (120 + (100 * i));
-	toplefty = (300 - (50 * i));
-	let rectangle = new Rectangle(topleftx, toplefty, topleftx + 100, toplefty + 20);
-	obstacles.push(rectangle);
-}
-bitlevel = new Level(obstacles, w_canvas, h_canvas);
+ChangeLevel();
 
 rectangle = {
 
@@ -123,6 +123,7 @@ controller = {
 	}
 
 };
+
 loop = function () {
 
 	if (controller.up && rectangle.jumping == false) {
@@ -144,20 +145,32 @@ loop = function () {
 
 	}
 
-	rectangle.y_velocity += 1.5;// gravity
+
+	Collision();
+
+	if (rectangle.jumping) {
+		rectangle.y_velocity += 1.5;// gravity
+	}
+	else {
+		console.log("colision");
+	}
+
+	rectangle.lastx = parseInt(rectangle.x);
+	rectangle.lasty = parseInt(rectangle.y);
+
 	rectangle.x += rectangle.x_velocity;
 	rectangle.y += rectangle.y_velocity;
 	rectangle.x_velocity *= 0.9;// friction
 	rectangle.y_velocity *= 0.9;// friction
 
-	// if rectangle is falling below floor line
+	/*// if rectangle is falling below floor line
 	if (rectangle.y > h_canvas - h_floor - 37) {
 
 		rectangle.jumping = false;
 		rectangle.y = h_canvas - h_floor - 37;
 		rectangle.y_velocity = 0;
+	}*/
 
-	}
 	//Collision against the random obstacles
 	//missing code
 	if (level == 0 && rectangle.x < 0) {
@@ -167,24 +180,21 @@ loop = function () {
 		rectangle.x = w_canvas;
 		level_down = true;
 		level -= 1;
+		ChangeLevel();
 
 	} else if (rectangle.x > w_canvas) {// if rectangle goes past right boundary
 
 		rectangle.x = -32;
 		level_up = true;
 		level += 1;
+		ChangeLevel();
 	}
-
-	Collision();
-	//Obstacle
 
 	DrawMain(); //Draws the background and the player
 	bitlevel.DrawLevel(); //Draws the level
 
 	//After doing everything changes the lastx and last y so it can be used in the next frame
 	//We do the parseInt here so we don't need to do it in the Collision function
-	rectangle.lastx = parseInt(rectangle.x);
-	rectangle.lasty = parseInt(rectangle.y);
 
 	//show level on screen 
 	context.fillStyle = "#ffffff";
@@ -200,7 +210,7 @@ window.addEventListener("keydown", controller.keyListener)
 window.addEventListener("keyup", controller.keyListener);
 window.requestAnimationFrame(loop);
 
-function DrawMain(){
+function DrawMain() {
 
 
 	context.fillStyle = "#202020";
@@ -220,6 +230,8 @@ function DrawMain(){
 
 function Collision() { //Will use the bitmap for the current level
 
+	rectangle.jumping = true;
+
 	var collision_bitmap = bitlevel.bitmap;
 	//Initializes the coords we might need, eventually
 	let x1 = parseInt(rectangle.x);
@@ -232,16 +244,22 @@ function Collision() { //Will use the bitmap for the current level
 	let Lx2 = x1 + rectangle.width;
 	let Ly2 = y1 + rectangle.height;
 
+	//So it not bugs when reaches the ceiling
+	if (y1 < 0) y1 = 0;
+	if (y2 < 0) y2 = 0;
+	if (Ly1 < 0) Ly1 = 0;
+	if (Ly2 < 0) Ly2 = 0;
+
 	//The system checks the position of the corners
 	//Might not work if the objects are too small (smaller than the rectangle)
 	//For that we can check in the middle and in the center as well
 
-	if(collision_bitmap[y1][x1]){ //Top left corner has hit an object
-		if(Ly1 > y1){ //If the object is jumping
-			if(collision_bitmap[y1+precision][x1]){
+	if (collision_bitmap[y1][x1]) { //Top left corner has hit an object
+		if (Ly1 > y1) { //If the object is jumping
+			if (collision_bitmap[y1 + precision][x1]) {
 				rectangle.y_velocity = 0;
 			}
-			
+
 		}
 
 		/*
@@ -251,13 +269,13 @@ function Collision() { //Will use the bitmap for the current level
 		*/
 	}
 
-	else if(collision_bitmap[y1][x2]){ //Top right corner has hit an object
+	else if (collision_bitmap[y1][x2]) { //Top right corner has hit an object
 
-		if(Ly1 > y1){ //If the object is jumping
-			if(collision_bitmap[y1+precision][x2]){
+		if (Ly1 > y1) { //If the object is jumping
+			if (collision_bitmap[y1 + precision][x2]) {
 				rectangle.y_velocity = 0;
 			}
-			
+
 		}
 
 		/*
@@ -265,18 +283,20 @@ function Collision() { //Will use the bitmap for the current level
 			rectangle.x_velocity = 0;
 		}
 		*/
-		
+
 	}
 
-	else if(collision_bitmap[y2][x1]){ //Bot left corner has hit an object
-		
-		if(Ly1 < y1){ //If the object is falling
-			if(collision_bitmap[y2-precision][x1]){
+	else if (collision_bitmap[y2][x1]) { //Bot left corner has hit an object
+
+		console.log("bot left");
+		if (Ly1 < y1) { //If the object is falling
+			console.log("passed condition");
+			if (collision_bitmap[y2 - precision][x1]) {
 				rectangle.y_velocity = 0;
-				rectangle.y -=precision-1;
+				rectangle.y -= precision;
 				rectangle.jumping = false;
 			}
-			
+
 		}
 
 		/*
@@ -287,15 +307,16 @@ function Collision() { //Will use the bitmap for the current level
 
 	}
 
-	else if(collision_bitmap[y1][x2]){ //Bot right corner has hit an object
+	else if (collision_bitmap[y2][x2]) { //Bot right corner has hit an object
 
-		if(Ly1 < y1){ //If the object is falling
-			if(collision_bitmap[y2-precision][x2]){
+		console.log("bot right");
+		if (Ly1 < y1) { //If the object is falling
+			if (collision_bitmap[y2 - precision][x2]) {
 				rectangle.y_velocity = 0;
-				rectangle.y -=precision-1;
+				rectangle.y -= precision;
 				rectangle.jumping = false;
 			}
-			
+
 		}
 
 		/*
@@ -303,35 +324,34 @@ function Collision() { //Will use the bitmap for the current level
 			rectangle.x_velocity = 0;
 		}
 		*/
-		
+
 	}
+}
 
-	/*
-	if (collision_bitmap[y2][x1] || collision_bitmap[y2][x2]) { //If one of the bottom corners has hit an object.
+function ChangeLevel() {
 
-		
-		if (Ly1 < y1) { //If the object is falling and has hit an object
+	obstacles = [];
 
-			//We have to cancel the jumping
-			rectangle.jumping = false;
-			//We have to say that the vertical velocity is 0
-			rectangle.y_velocity = 0;
-			//We have to put the rectangle above the object
-			var corner;
-			if (collision_bitmap[y2][x1]) { //If the bottom left corner has hit the object
-				corner = x1;
+	switch (level) {
+
+		case 0:
+			for (var i = 0; i < 5; i++) {
+				topleftx = (120 + (100 * i));
+				toplefty = (300 - (50 * i));
+				let rectangle = new Rectangle(topleftx, toplefty, topleftx + 100, toplefty + 20);
+				obstacles.push(rectangle);
 			}
-			else if (collision_bitmap[y2][x2]) //If the bottom right corner has hit the object
-				corner = x2;
-			do {
-				counter++;
-			} while (bitmap[y1 - counter][corner])
-		}
-
+			break;
+		case 1:
+			let rectangle1 = new Rectangle(50, 320, 100, 360);
+			obstacles.push(rectangle1);
+			let rectangle2 = new Rectangle(150, 250, 200, 290);
+			obstacles.push(rectangle2);
+			let rectangle3 = new Rectangle(300, 180, 400, 200);
+			obstacles.push(rectangle3);
+			break;
 	}
-	else if(collision_bitmap[y1][x1] || collision_bitmap[y1][x2]){ //One of the top corners has hit an object
-		
 
-	}
-	*/
+
+	bitlevel = new Level(obstacles);
 }
