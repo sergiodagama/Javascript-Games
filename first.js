@@ -176,23 +176,9 @@ loop = function () {
 	}
 
 	Collision();
+	//Obstacle
 
-
-	context.fillStyle = "#202020";
-	context.fillRect(0, 0, w_canvas, h_canvas);// x, y, width, height
-	context.fillStyle = "#ff0000";// hex for red
-	context.beginPath();
-	context.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-	context.fill();
-	context.strokeStyle = "#207830";
-	context.lineWidth = 10;
-	context.beginPath();
-	context.moveTo(0, (h_canvas - h_floor));
-	context.lineTo(w_canvas, (h_canvas - h_floor));
-	context.stroke();
-	//Obstacles
-	context.fillStyle = "#af4112";
-
+	DrawMain(); //Draws the background and the player
 	bitlevel.DrawLevel(); //Draws the level
 
 	//After doing everything changes the lastx and last y so it can be used in the next frame
@@ -213,6 +199,24 @@ loop = function () {
 window.addEventListener("keydown", controller.keyListener)
 window.addEventListener("keyup", controller.keyListener);
 window.requestAnimationFrame(loop);
+
+function DrawMain(){
+
+
+	context.fillStyle = "#202020";
+	context.fillRect(0, 0, w_canvas, h_canvas);// x, y, width, height
+	context.fillStyle = "#ff0000";// hex for red
+	context.beginPath();
+	context.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+	context.fill();
+	context.strokeStyle = "#207830";
+	context.lineWidth = 10;
+	context.beginPath();
+	context.moveTo(0, (h_canvas - h_floor));
+	context.lineTo(w_canvas, (h_canvas - h_floor));
+	context.stroke();
+
+}
 
 function Collision() { //Will use the bitmap for the current level
 
