@@ -1,0 +1,4 @@
+Class Rectangle
+	Object Collision function
+
+FPS using var seconds = new Date().getTime() / 1000;
