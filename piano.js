@@ -26,7 +26,7 @@ controller = {
     tile: undefined,
     date: Date(), //Gets the date
     level: 1,
-    timestarted: this.date.getTime(), //The time (in milliseconds)
+    timestarted: undefined, //The time (in milliseconds)
     timeoflevel:0, //Time that the level takes
     lastfps: 0,
     fps: 0,
