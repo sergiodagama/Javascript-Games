@@ -24,7 +24,10 @@ context.canvas.width = w_canvas;
 controller = {
 
     tile: undefined,
-    time: Date(),
+    date: Date(), //Gets the date
+    level: 1,
+    timestarted: this.date.getTime(), //The time (in milliseconds)
+    timeoflevel:0, //Time that the level takes
     lastfps: 0,
     fps: 0,
     score: 0,
@@ -153,16 +156,24 @@ function DrawFPS() {
     context.fillStyle = "#00ff00"
     context.font = "10px Arial";
 
-    if (Date() === controller.time) {
+    if (Date() === controller.date) {
         controller.fps++;
     }
     else {
         controller.lastfps = controller.fps;
         controller.fps = 0;
-        controller.time = Date();
+        controller.date = Date();
     }
 
     context.fillText(controller.lastfps, w_canvas - 50, 20);
+}
+
+function CalculateLevel(){
+
+    var leveltime = (20*level + 1000)/level; //Inverse function that gives me the time for each level (in seconds)
+    var leveltime_milliseconds = leveltime * 1000;
+    controller.timeoflevel = leveltime_milliseconds;
+ 
 }
 
 
