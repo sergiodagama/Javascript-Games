@@ -4,7 +4,7 @@ var vertical_tiles = 4; //How many tiles are shown vertically
 var horizontal_tiles = 4; //How many tiles are shown horizontally
 var tiles = [];
 
-var keys = [65, 83, 68, 70];
+var keys = [65, 83, 68, 70]; //Not used for now. Might be implemented if there are more than 4 tiles
 
 var w_tiles = w_canvas / horizontal_tiles; //Width of each tile
 var h_tiles = h_canvas / vertical_tiles; //Height of each tile
@@ -42,6 +42,7 @@ controller = {
 
         if (event.type == "keyup") {
 
+            //Uses 4 cases for the 4 tiles there are
             switch (event.keyCode) {
 
                 case 65: //a
