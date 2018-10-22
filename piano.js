@@ -128,6 +128,7 @@ function RandomizeTiles() {//Moves the tiles down inside the array and adds a ne
         //Score and level
         controller.score++;
         if(controller.score > level * level_score){
+            level++;
             CalculateLevel();
         }
 
