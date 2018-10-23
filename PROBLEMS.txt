@@ -1,0 +1,8 @@
+Cannot do the import of the classes through modules.
+Either solve it our put it all in the main.js file and sort the order, maybe by using async methods
+
+In Collision(), crashes if goes above the screen
+Does not detect side colisions yet
+
+After hiting an object from the top, will skim through the obstacle
+//Doing rectangle.y -=precision-1 kind of fixes the issue, despite being buggy. Solution might be only apply gravity if it is falling
