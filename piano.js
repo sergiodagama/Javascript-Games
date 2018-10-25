@@ -4,10 +4,17 @@ var vertical_tiles = 4; //How many tiles are shown vertically
 var horizontal_tiles = 4; //How many tiles are shown horizontally
 var tiles = [];
 
+var keys = [65, 83, 68, 70]; //Not used for now. Might be implemented if there are more than 4 tiles
+
 var w_tiles = w_canvas / horizontal_tiles; //Width of each tile
 var h_tiles = h_canvas / vertical_tiles; //Height of each tile
 
+var w_time = w_canvas / 2;
+var h_time = 10;
+
 var gameover = false;
+var level = 1;
+var level_score = 50;
 
 //Initialize the tiles
 for (var i = 0; i < vertical_tiles; i++) {
@@ -24,11 +31,10 @@ context.canvas.width = w_canvas;
 controller = {
 
     tile: undefined,
-    date: Date(), //Gets the date
-    level: 1,
     timestarted: undefined, //The time (in milliseconds)
-    timeoflevel:0, //Time that the level takes
+    timeoflevel: 0, //Time that the level takes
     lastfps: 0,
+    //date: Date(),
     fps: 0,
     score: 0,
 
@@ -36,6 +42,7 @@ controller = {
 
         if (event.type == "keyup") {
 
+            //Uses 4 cases for the 4 tiles there are
             switch (event.keyCode) {
 
                 case 65: //a
@@ -62,13 +69,16 @@ controller = {
 
 };
 
+CalculateLevel(); //Calculates the first level
+
 loop = function () {
 
     DrawMain();
     DrawTiles();
     DrawBorders();
     DrawScore();
-    DrawFPS();
+    //DrawFPS();
+    DrawLevel();
 
     window.requestAnimationFrame(loop);
 };
@@ -112,9 +122,16 @@ function DrawTiles() {
 }
 
 function RandomizeTiles() {//Moves the tiles down inside the array and adds a new one
+
     if (controller.tile === tiles[0] && !gameover) { //The player has pressed the right key
 
+        //Score and level
         controller.score++;
+        if(controller.score > level * level_score){
+            level++;
+            CalculateLevel();
+        }
+
         for (var i = 0; i < vertical_tiles - 1; i++) {
             tiles[i] = tiles[i + 1];
         }
@@ -168,12 +185,37 @@ function DrawFPS() {
     context.fillText(controller.lastfps, w_canvas - 50, 20);
 }
 
-function CalculateLevel(){
+function CalculateLevel() {
 
-    var leveltime = (20*level + 1000)/level; //Inverse function that gives me the time for each level (in seconds)
-    var leveltime_milliseconds = leveltime * 1000;
+    //Change functio here
+    var leveltime = (20 * level + 5) / level; //Inverse function that gives me the time for each level (in seconds)
+
+    var leveltime_milliseconds = leveltime * 1000; //Passing to milliseconds
     controller.timeoflevel = leveltime_milliseconds;
- 
+    console.log(controller.timeoflevel);
+
+    //Gets the time when the level started
+    let date = new Date();
+    controller.timestarted = date.getTime();
+
+}
+
+function DrawLevel() {
+    let date = new Date();
+    let time = date.getTime();
+    let time_elapsed = time - controller.timestarted;
+    if (time_elapsed > controller.timeoflevel) { //The time of the level as already elapsed
+        gameover = true;
+        window.requestAnimationFrame(loop);
+    }
+
+    //If it hasn't been game over, print the time bar
+    if (!gameover) {
+        context.fillStyle = "#00ff00";
+        let size_time = (controller.timeoflevel - time_elapsed) / controller.timeoflevel * w_time;
+        console.log(size_time);
+        context.fillRect(w_canvas / 2 - w_time / 2, 20, size_time, h_time);
+    }
 }
 
 
