@@ -80,6 +80,8 @@ controller = {
             var x = event.pageX - x_canvas;
             //var y = event.pageY - y_canvas;
 
+            if(x < 0 || x > w_canvas) return //Outside of the boundaries
+
             //console.log(x + "total x");
             controller.tile = (x - (x % w_tiles)) / w_tiles; //The controller.tile depends on the collumn that the mouse click is on
 
