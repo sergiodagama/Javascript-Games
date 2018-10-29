@@ -72,15 +72,15 @@ controller = {
             //Gets them everyclick so it gets the right tile even if the page is minimized or its format is changes
             var xy_canvas = context.canvas.getBoundingClientRect();
             var x_canvas = xy_canvas.left;
-            //var y_canvas = xy_canvas.top;
+            var y_canvas = xy_canvas.top;
             //console.log(x_canvas + "x_canvas");
 
             //console.log("mouse");
             //console.log(event.pageX + "event.pageX");
             var x = event.pageX - x_canvas;
-            //var y = event.pageY - y_canvas;
+            var y = event.pageY - y_canvas;
 
-            if(x < 0 || x > w_canvas) return //Outside of the boundaries
+            if(x < 0 || x > w_canvas || y < 0 || y > h_canvas) return //Outside of the boundaries
 
             //console.log(x + "total x");
             controller.tile = (x - (x % w_tiles)) / w_tiles; //The controller.tile depends on the collumn that the mouse click is on
