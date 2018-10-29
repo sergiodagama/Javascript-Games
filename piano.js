@@ -9,6 +9,7 @@ var keys = [65, 83, 68, 70]; //Not used for now. Might be implemented if there a
 var w_tiles = w_canvas / horizontal_tiles; //Width of each tile
 var h_tiles = h_canvas / vertical_tiles; //Height of each tile
 
+
 var w_time = w_canvas / 2;
 var h_time = 10;
 
@@ -65,6 +66,26 @@ controller = {
             }
         }
 
+        if (event.type === "mousedown") {
+
+            //To get the coords of the top of the canvas
+            //Gets them everyclick so it gets the right tile even if the page is minimized or its format is changes
+            var xy_canvas = context.canvas.getBoundingClientRect();
+            var x_canvas = xy_canvas.left;
+            //var y_canvas = xy_canvas.top;
+            //console.log(x_canvas + "x_canvas");
+
+            //console.log("mouse");
+            //console.log(event.pageX + "event.pageX");
+            var x = event.pageX - x_canvas;
+            //var y = event.pageY - y_canvas;
+
+            //console.log(x + "total x");
+            controller.tile = (x - (x % w_tiles)) / w_tiles; //The controller.tile depends on the collumn that the mouse click is on
+
+            RandomizeTiles();
+        }
+
     }
 
 };
@@ -85,6 +106,7 @@ loop = function () {
 
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
+window.addEventListener("mousedown", controller.keyListener);
 window.requestAnimationFrame(loop);
 
 function DrawMain() {
@@ -123,11 +145,11 @@ function DrawTiles() {
 
 function RandomizeTiles() {//Moves the tiles down inside the array and adds a new one
 
+    console.log("controller.tile" + controller.tile)
     if (controller.tile === tiles[0] && !gameover) { //The player has pressed the right key
-
         //Score and level
         controller.score++;
-        if(controller.score > level * level_score){
+        if (controller.score > level * level_score) {
             level++;
             CalculateLevel();
         }
@@ -192,7 +214,7 @@ function CalculateLevel() {
 
     var leveltime_milliseconds = leveltime * 1000; //Passing to milliseconds
     controller.timeoflevel = leveltime_milliseconds;
-    console.log(controller.timeoflevel);
+    //console.log(controller.timeoflevel);
 
     //Gets the time when the level started
     let date = new Date();
@@ -213,7 +235,7 @@ function DrawLevel() {
     if (!gameover) {
         context.fillStyle = "#00ff00";
         let size_time = (controller.timeoflevel - time_elapsed) / controller.timeoflevel * w_time;
-        console.log(size_time);
+        //console.log(size_time);
         context.fillRect(w_canvas / 2 - w_time / 2, 20, size_time, h_time);
     }
 }
