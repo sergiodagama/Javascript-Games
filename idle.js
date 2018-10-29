@@ -78,6 +78,11 @@ function OrganicMatterUpdate() {
         context.fillText(life_form.name + '- Amount: ' + life_form.amount + ' Price: ' + life_form.price, 320, h_stats);
         h_stats +=15;
         }
+        else{
+            context.fillText(life_form.name + '- Amount: ' + life_form.amount + ' Price: ' + life_form.price, 320, h_stats);
+            h_stats +=15;
+            break;
+        }
     }
 }
 
