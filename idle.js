@@ -26,11 +26,11 @@ class Producer {
         this.base_price = price; //Constant
         this.price = price;
         this.production = production;
-        this.ammount = 0;
+        this.amount = 0;
     }
 
     CalcPrice() {
-        this.price = parseInt(Math.pow(this.base_price, 1 + this.ammount * price_grow_ratio));
+        this.price = parseInt(Math.pow(this.base_price, 1 + this.amount * price_grow_ratio));
     }
 
     BuyProducer() {
@@ -39,19 +39,27 @@ class Producer {
         console.log(organic_matter);
         if (organic_matter >= this.price) {
             organic_matter -= this.price;
-            this.ammount++;
+            this.amount++;
             this.CalcPrice();
         }
     }
 
     SpawnMatter() {
-        organic_matter += this.production * this.ammount;
+        organic_matter += this.production * this.amount;
     }
 }
 
 var life_forms = [];
 life_forms.push(new Producer("Cell", 20, 0.3/update_ratio));
 life_forms.push(new Producer("Tissue", 50, 5/update_ratio));
+life_forms.push(new Producer("Organ", 500, 20/update_ratio));
+life_forms.push(new Producer("Organ System", 4000, 100/update_ratio));
+life_forms.push(new Producer("Body", 20000, 600/update_ratio));
+life_forms.push(new Producer("Community", 120000, 4200/update_ratio));
+life_forms.push(new Producer("Environment", 500000, 15000/update_ratio));
+life_forms.push(new Producer("Coutry Area", 1000000, 60000/update_ratio));
+life_forms.push(new Producer("Continent", 5000000, 100000/update_ratio));
+life_forms.push(new Producer("Planet", 10000000, 300000/update_ratio));
 
 function OrganicMatterUpdate() {
 
@@ -59,9 +67,18 @@ function OrganicMatterUpdate() {
         life_form.SpawnMatter();
     
     }
-
     context.fillStyle = '#ffffff';
+    context.font = '25px Arial';
     context.fillText("Organic Matter " + parseInt(organic_matter), 320, 40);
+    context.font = '12px Arial';
+
+    let h_stats = 70
+    for(var life_form of life_forms){
+        if(organic_matter > life_form.price || life_form.amount > 0){
+        context.fillText(life_form.name + '- Amount: ' + life_form.amount + ' Price: ' + life_form.price, 320, h_stats);
+        h_stats +=15;
+        }
+    }
 }
 
 
