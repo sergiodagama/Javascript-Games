@@ -168,7 +168,7 @@ function CalcAsteroids() {
     for (var asteroid of asteroids) {
         asteroid.movement();
         asteroid.print();
-        asteroid.collision();
+        //asteroid.collision();
 
         //Check if the asteroid has left the screen
         let trash = asteroid.outofbondaries();
@@ -187,6 +187,10 @@ function CalcAsteroids() {
 asteroids.push(new Asteroid(10, 10, 0, 0, 1));
 asteroids.push(new Asteroid(0, 0, 1, 3 * Math.PI / 4, 2));
 
+CreateAsteroid();
+CreateAsteroid();
+CreateAsteroid();
+
 function loop() {
     context.fillStyle = "#000000";
     context.fillRect(0, 0, w_canvas, h_canvas);
@@ -201,6 +205,34 @@ function loop() {
     CalcAsteroids();
 
 window.requestAnimationFrame(loop);
+}
+
+function CreateAsteroid(){
+
+    let outside_angle = Math.random() * 2*Math.PI; //Defines the position from where the asteroid starts from
+    let inside_angle = Math.random() * 2*Math.PI; //Defines the position where the asteroid heads to
+
+    let outside_x = w_canvas/2 + Math.sin(outside_angle) * 200;
+    let outside_y = h_canvas/2 + -Math.cos(outside_angle) * 200;
+
+    let inside_x = w_canvas/2 + Math.sin(inside_angle) * 10;
+    let inside_y = h_canvas/2 + -Math.cos(inside_angle) * 10;
+
+    let movement_x = inside_x - outside_x;
+    let movement_y = inside_y - outside_y;
+
+    var angle;
+    if(movement_x > 0){
+        angle = Math.atan(movement_x/movement_y);
+    }
+    else{
+        angle = -Math.atan(movement_x/movement_y);
+    }
+
+    console.log("outside", outside_angle, "inside", inside_angle, "outx", outside_x, "outy", outside_y, "inx", inside_x, "iny", inside_y, "movx", movement_x, "movy", movement_y, "angle", angle);
+
+    asteroids.push(new Asteroid(outside_x, outside_y, 2, angle, 1));
+
 }
 
 window.addEventListener("keydown", controller.keyListener);
