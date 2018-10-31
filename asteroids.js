@@ -149,9 +149,10 @@ class Asteroid {
     }
 
     outofbondaries() {
-        if (this.x < 0 || this.x > w_canvas || this.y < 0 || this.y > h_canvas) {
-            return true;
-        }
+        if(this.x_velocity > 0 && this.x > w_canvas) return true;
+        if(this.x_velocity < 0 && this.x < 0) return true;
+        if(this.y_velocity < 0 && this.y < 0) return true;
+        if(this.y_velocity > 0 && this.y > h_canvas) return true;
     }
 
     collision(){
@@ -184,12 +185,9 @@ function CalcAsteroids() {
     }
 }
 
-asteroids.push(new Asteroid(10, 10, 0, 0, 1));
-asteroids.push(new Asteroid(0, 0, 1, 3 * Math.PI / 4, 2));
-
+for(var i = 0; i < 100; i ++){
 CreateAsteroid();
-CreateAsteroid();
-CreateAsteroid();
+}
 
 function loop() {
     context.fillStyle = "#000000";
@@ -212,21 +210,28 @@ function CreateAsteroid(){
     let outside_angle = Math.random() * 2*Math.PI; //Defines the position from where the asteroid starts from
     let inside_angle = Math.random() * 2*Math.PI; //Defines the position where the asteroid heads to
 
-    let outside_x = w_canvas/2 + Math.sin(outside_angle) * 200;
-    let outside_y = h_canvas/2 + -Math.cos(outside_angle) * 200;
+    //The constants multiplied by define the "radius" of where we are coming from
+    //Makes so we come from outside the screen
+    let outside_x = w_canvas/2 + Math.sin(outside_angle) * 550;
+    let outside_y = h_canvas/2 + -Math.cos(outside_angle) * 400;
 
-    let inside_x = w_canvas/2 + Math.sin(inside_angle) * 10;
-    let inside_y = h_canvas/2 + -Math.cos(inside_angle) * 10;
+    //The constants multiplied by define the "radius" of where we are going to
+    //Makes so we have almost all paths in the screen
+    let inside_x = w_canvas/2 + Math.sin(inside_angle) * 350;
+    let inside_y = h_canvas/2 + -Math.cos(inside_angle) * 300;
 
+    //Gets the displacement
     let movement_x = inside_x - outside_x;
     let movement_y = inside_y - outside_y;
 
+
+    //Calculates the angle given the displacement
     var angle;
     if(movement_x > 0){
-        angle = Math.atan(movement_x/movement_y);
+        angle = Math.atan(movement_y/movement_x) + Math.PI/2;
     }
     else{
-        angle = -Math.atan(movement_x/movement_y);
+        angle = Math.atan(movement_y/movement_x) + 3 * Math.PI / 2;
     }
 
     console.log("outside", outside_angle, "inside", inside_angle, "outx", outside_x, "outy", outside_y, "inx", inside_x, "iny", inside_y, "movx", movement_x, "movy", movement_y, "angle", angle);
