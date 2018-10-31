@@ -2,6 +2,9 @@ var player, controller;
 var w_canvas = 800;
 var h_canvas = 500;
 
+var gameover = false;
+var asteroids = [];
+
 context = document.querySelector("canvas").getContext("2d");
 context.canvas.width = w_canvas;
 context.canvas.height = h_canvas;
@@ -21,6 +24,7 @@ player = {
 
     player_wingspan: 16,
     player_height: 16,
+    player_hitbox: 5,
 
     print: function () {
         context.fillStyle = "#0000ff";
@@ -53,20 +57,23 @@ player = {
 
             player.velocity = Math.sqrt(Math.pow(x_velocity, 2) + Math.pow(y_velocity, 2));
 
+            //Domain of atan is from -Pi/2 to Pi/2
             if (x_velocity > 0) {
                 player.velocity_direction = Math.atan(y_velocity / x_velocity) + Math.PI / 2;
             }
             else {
                 player.velocity_direction = Math.atan(y_velocity / x_velocity) + 3 * Math.PI / 2;
             }
-            console.log("direction", player.velocity_direction);
+
         }
+
         if (controller.left) {
             player.direction -= player.turning_speed;
             if (player.direction < 0) {
                 player.direction += 2 * Math.PI;
             }
         }
+
         if (controller.right) {
             player.direction += player.turning_speed;
             if (player.direction > 2 * Math.PI) {
@@ -114,7 +121,71 @@ controller = {
 
 }
 
+class Asteroid {
 
+    constructor(x, y, velocity, direction, size) {
+
+        this.x = x;
+        this.y = y;
+        this.velocity = velocity;
+        this.direction = direction;
+        this.size = size;
+        this.size_multiplier = 5;
+        this.y_velocity = velocity * -Math.cos(direction)
+        this.x_velocity = velocity * Math.sin(direction);
+    }
+
+
+    print() {
+        context.fillStyle = "#1f180c";
+        context.beginPath();
+        context.arc(this.x, this.y, this.size * 5, 0, 2 * Math.PI);
+        context.fill();
+    }
+
+    movement() {
+        this.x += this.x_velocity;
+        this.y += this.y_velocity;
+    }
+
+    outofbondaries() {
+        if (this.x < 0 || this.x > w_canvas || this.y < 0 || this.y > h_canvas) {
+            return true;
+        }
+    }
+
+    collision(){
+        let x = player.x - this.x;
+        let y = player.y - this.y;
+        let distance = Math.sqrt(x*x + y*y);
+        if( distance < (this.size * this.size_multiplier + player.player_hitbox)){ //There as a collision
+            gameover = true;
+        }
+    }
+}
+
+function CalcAsteroids() {
+    for (var asteroid of asteroids) {
+        asteroid.movement();
+        asteroid.print();
+        asteroid.collision();
+
+        //Check if the asteroid has left the screen
+        let trash = asteroid.outofbondaries();
+        if (trash) {
+
+            //Removes the asteroid that got out of the screen
+            //https://stackoverflow.com/questions/10024866/remove-object-from-array-using-javascript
+            let idx = asteroids.indexOf(asteroid);
+            if (idx !== -1) {
+                asteroids.splice(idx, 1);
+            }
+        }
+    }
+}
+
+asteroids.push(new Asteroid(10, 10, 0, 0, 1));
+asteroids.push(new Asteroid(0, 0, 1, 3 * Math.PI / 4, 2));
 
 function loop() {
     context.fillStyle = "#000000";
@@ -122,10 +193,14 @@ function loop() {
 
     //console.log(player.direction);
 
+    if(!gameover){
     player.movement();
     player.print();
+    }
 
-    window.requestAnimationFrame(loop);
+    CalcAsteroids();
+
+window.requestAnimationFrame(loop);
 }
 
 window.addEventListener("keydown", controller.keyListener);
