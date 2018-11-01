@@ -291,7 +291,6 @@ function loop() {
         //Player calculation
         player.movement();
         player.print();
-        CalcBullets();
 
         //Score
         let this_time = new Date();
@@ -304,6 +303,7 @@ function loop() {
     context.fillStyle = "#ffffff";
     context.fillText(score, w_canvas - 50, 20, 50);
 
+    CalcBullets();
     CalcAsteroids();
     CalcLevel();
 
