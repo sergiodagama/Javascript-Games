@@ -7,10 +7,13 @@ var difficulty = 5;
 var last_time;
 var score_multiplier = 0.2;
 var score = 0;
+
 var asteroids = [];
 var asteroids_initial = 20;
 var asteroids_destroyed;
 var asteroids_outofbondaries;
+
+var bullets = [];
 
 context = document.querySelector("canvas").getContext("2d");
 context.canvas.width = w_canvas;
@@ -26,6 +29,9 @@ player = {
 
     turning_speed: 5 / 360 * 2 * Math.PI, //Affects the speed with which the player turns
     forward_speed: 0.3,
+    bullet_speed: 5, //Affects the speed of the bullets
+    bullet_size: 2,
+
     velocity_direction: 0,
     direction: 0, //Angle between 0 and 2PI
 
@@ -94,7 +100,6 @@ player = {
         player.y = (player.y + h_canvas + player.y_velocity) % h_canvas;
     }
 
-
 }
 
 
@@ -107,6 +112,7 @@ controller = {
 
     keyListener: function (event) {
         var key_state = event.type == "keydown" ? true : false;
+        var shooting_state = event.type == "keyup" ? true: false;
 
         switch (event.keyCode) {
             case 65: //a key
@@ -117,6 +123,10 @@ controller = {
                 break;
             case 68: //d key
                 controller.right = key_state;
+                break;
+            case 32: //Space key
+                if(shooting_state) bullets.push(new Bullet(player.x, player.y, player.direction));
+                console.log(bullets);
                 break;
         }
     }
@@ -130,7 +140,6 @@ class Asteroid {
         this.x = x;
         this.y = y;
         this.velocity = velocity;
-        this.direction = direction;
         this.size = size;
         this.size_multiplier = 5;
         this.y_velocity = velocity * -Math.cos(direction)
@@ -157,27 +166,79 @@ class Asteroid {
         if (this.y_velocity > 0 && this.y > h_canvas) return true;
     }
 
-    collision() {
-        let x = player.x - this.x;
-        let y = player.y - this.y;
+    collision(x, y, size) {
+
+        //Coordinates of the vector between the asteroid and the object checking the collision with
+        x = x - this.x;
+        y = y - this.y;
+
         let distance = Math.sqrt(x * x + y * y);
-        if (distance < (this.size * this.size_multiplier + player.player_hitbox)) { //There as a collision
-            gameover = true;
+        if (distance < (this.size * this.size_multiplier + size)) { //There as a collision
+            return true;
         }
     }
 }
 
+class Bullet {
+
+    constructor(x, y, direction) {
+        this.x = x;
+        this.y = y;
+
+        //Adds the player velocity because they are moving as a whole
+        this.y_velocity = player.bullet_speed * -Math.cos(direction) + player.y_velocity;
+        this.x_velocity = player.bullet_speed * Math.sin(direction) + player.x_velocity;
+    }
+
+    print() {
+        context.fillStyle = "#ff0000";
+        context.beginPath();
+        context.arc(this.x, this.y, player.bullet_size, 0, 2 * Math.PI);
+        context.fill();
+    }
+
+    movement() {
+        this.x += this.x_velocity;
+        this.y += this.y_velocity;
+    }
+
+    outofboundaries() {
+        if (this.x_velocity > 0 && this.x > w_canvas) return true;
+        if (this.x_velocity < 0 && this.x < 0) return true;
+        if (this.y_velocity < 0 && this.y < 0) return true;
+        if (this.y_velocity > 0 && this.y > h_canvas) return true;
+    }
+
+}
+
 function CalcAsteroids() {
     for (var asteroid of asteroids) {
+
+        var trash = false; //Defines if the asteroid is going to be destroyed
+
         asteroid.movement();
         asteroid.print();
-        asteroid.collision();
+
+        //Check for collision with the player
+        let collided = asteroid.collision(player.x, player.y, player.player_hitbox);
+        if(collided) gameover = true;
+
+        //Check for collision with bullets
+        let destroyed = false;
+        for(var bullet of bullets){
+            destroyed = destroyed || asteroid.collision(bullet.x, bullet.y, player.bullet_size);
+            if(destroyed){//If there was a collision there is no need to check other bullets for the same asteroid
+                let i = bullets.indexOf(bullet);
+                bullets.splice(i, 1); //Deletes the bullet from the array
+            }
+        }
 
         //Check if the asteroid has left the screen
-        let trash = asteroid.outofbondaries();
-        if (trash) {
+        let outofbonds = asteroid.outofbondaries();
 
-            //Adds a new asteroid after one got out of the screen
+        if (outofbonds || destroyed) {
+
+            //Adds a new asteroid after one got out of the screen of destroyed
             let idx = asteroids.indexOf(asteroid);
             if (idx !== -1) {
                 //console.log("new one needed");
@@ -187,6 +248,25 @@ function CalcAsteroids() {
                 //console.log("asteroid");
                 asteroids[idx] = asteroid;
                 //console.log(asteroids[idx]);
+            }
+        }
+    }
+}
+
+function CalcBullets() {
+    for (var bullet of bullets) {
+        bullet.print();
+        bullet.movement();
+
+
+        let trash = bullet.outofboundaries();
+        if (trash) {
+
+            //Adds a new bullet after one got out of the screen
+            let idx = bullets.indexOf(bullet);
+            if (idx !== -1) {
+                bullets.splice(idx, 1);
+                console.log(bullets);
             }
         }
     }
@@ -211,6 +291,7 @@ function loop() {
         //Player calculation
         player.movement();
         player.print();
+        CalcBullets();
 
         //Score
         let this_time = new Date();
@@ -271,12 +352,12 @@ function CalcLevel() {
 }
 
 function CalcSize() {
-    let max_size = Math.log((score+1000) / 1000) ; //The max size of the asteroid is based of the score
+    let max_size = Math.log((score + 1000) / 1000); //The max size of the asteroid is based of the score
     return Math.floor(Math.random() * max_size) + 1;
 }
 
 function CalcVelocity() {
-    let max_velocity = (Math.log((score+500) / 500) + 2) / 2; //the max velocity of the asteroid is based on the score
+    let max_velocity = (Math.log((score + 500) / 500) + 2) / 2; //the max velocity of the asteroid is based on the score
     return Math.floor(Math.random() * max_velocity) + 1;
 }
 
