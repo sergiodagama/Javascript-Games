@@ -3,7 +3,14 @@ var w_canvas = 800;
 var h_canvas = 500;
 
 var gameover = false;
+var difficulty = 5;
+var last_time;
+var score_multiplier = 0.2;
+var score = 0;
 var asteroids = [];
+var asteroids_initial = 20;
+var asteroids_destroyed;
+var asteroids_outofbondaries;
 
 context = document.querySelector("canvas").getContext("2d");
 context.canvas.width = w_canvas;
@@ -57,13 +64,8 @@ player = {
 
             player.velocity = Math.sqrt(Math.pow(x_velocity, 2) + Math.pow(y_velocity, 2));
 
-            //Domain of atan is from -Pi/2 to Pi/2
-            if (x_velocity > 0) {
-                player.velocity_direction = Math.atan(y_velocity / x_velocity) + Math.PI / 2;
-            }
-            else {
-                player.velocity_direction = Math.atan(y_velocity / x_velocity) + 3 * Math.PI / 2;
-            }
+            //Gets the direction from the tan using the atan2 function
+            player.velocity_direction = Math.atan2(y_velocity, x_velocity) + Math.PI / 2;
 
         }
 
@@ -139,7 +141,7 @@ class Asteroid {
     print() {
         context.fillStyle = "#1f180c";
         context.beginPath();
-        context.arc(this.x, this.y, this.size * 5, 0, 2 * Math.PI);
+        context.arc(this.x, this.y, this.size * this.size_multiplier, 0, 2 * Math.PI);
         context.fill();
     }
 
@@ -149,17 +151,17 @@ class Asteroid {
     }
 
     outofbondaries() {
-        if(this.x_velocity > 0 && this.x > w_canvas) return true;
-        if(this.x_velocity < 0 && this.x < 0) return true;
-        if(this.y_velocity < 0 && this.y < 0) return true;
-        if(this.y_velocity > 0 && this.y > h_canvas) return true;
+        if (this.x_velocity > 0 && this.x > w_canvas) return true;
+        if (this.x_velocity < 0 && this.x < 0) return true;
+        if (this.y_velocity < 0 && this.y < 0) return true;
+        if (this.y_velocity > 0 && this.y > h_canvas) return true;
     }
 
-    collision(){
+    collision() {
         let x = player.x - this.x;
         let y = player.y - this.y;
-        let distance = Math.sqrt(x*x + y*y);
-        if( distance < (this.size * this.size_multiplier + player.player_hitbox)){ //There as a collision
+        let distance = Math.sqrt(x * x + y * y);
+        if (distance < (this.size * this.size_multiplier + player.player_hitbox)) { //There as a collision
             gameover = true;
         }
     }
@@ -169,77 +171,116 @@ function CalcAsteroids() {
     for (var asteroid of asteroids) {
         asteroid.movement();
         asteroid.print();
-        //asteroid.collision();
+        asteroid.collision();
 
         //Check if the asteroid has left the screen
         let trash = asteroid.outofbondaries();
         if (trash) {
 
-            //Removes the asteroid that got out of the screen
-            //https://stackoverflow.com/questions/10024866/remove-object-from-array-using-javascript
+            //Adds a new asteroid after one got out of the screen
             let idx = asteroids.indexOf(asteroid);
             if (idx !== -1) {
-                asteroids.splice(idx, 1);
+                //console.log("new one needed");
+                let size = CalcSize();
+                let velocity = CalcVelocity();
+                asteroid = CreateAsteroid(size, velocity);
+                //console.log("asteroid");
+                asteroids[idx] = asteroid;
+                //console.log(asteroids[idx]);
             }
         }
     }
 }
 
-for(var i = 0; i < 100; i ++){
-CreateAsteroid();
+//Create the initial ammount of Asteroids
+for (var i = 0; i < asteroids_initial; i++) {
+    let asteroid = CreateAsteroid();
+    asteroids.push(asteroid);
 }
+//console.log("all good");
 
 function loop() {
+
+    //Background
     context.fillStyle = "#000000";
     context.fillRect(0, 0, w_canvas, h_canvas);
 
     //console.log(player.direction);
 
-    if(!gameover){
-    player.movement();
-    player.print();
+    if (!gameover) {
+        //Player calculation
+        player.movement();
+        player.print();
+
+        //Score
+        let this_time = new Date();
+        score += parseInt((this_time - last_time) * score_multiplier);
+        last_time = this_time; //Updates the time
+
     }
 
-    CalcAsteroids();
+    //Score Print
+    context.fillStyle = "#ffffff";
+    context.fillText(score, w_canvas - 50, 20, 50);
 
-window.requestAnimationFrame(loop);
+    CalcAsteroids();
+    CalcLevel();
+
+    window.requestAnimationFrame(loop);
 }
 
-function CreateAsteroid(){
+function CreateAsteroid(size = 1, velocity = 1) {
 
-    let outside_angle = Math.random() * 2*Math.PI; //Defines the position from where the asteroid starts from
-    let inside_angle = Math.random() * 2*Math.PI; //Defines the position where the asteroid heads to
+    let outside_angle = Math.random() * 2 * Math.PI; //Defines the position from where the asteroid starts from
+    let inside_angle = Math.random() * 2 * Math.PI; //Defines the position where the asteroid heads to
 
     //The constants multiplied by define the "radius" of where we are coming from
     //Makes so we come from outside the screen
-    let outside_x = w_canvas/2 + Math.sin(outside_angle) * 550;
-    let outside_y = h_canvas/2 + -Math.cos(outside_angle) * 400;
+    let outside_x = w_canvas / 2 + Math.sin(outside_angle) * 550;
+    let outside_y = h_canvas / 2 + -Math.cos(outside_angle) * 400;
 
     //The constants multiplied by define the "radius" of where we are going to
     //Makes so we have almost all paths in the screen
-    let inside_x = w_canvas/2 + Math.sin(inside_angle) * 350;
-    let inside_y = h_canvas/2 + -Math.cos(inside_angle) * 300;
+    let inside_x = w_canvas / 2 + Math.sin(inside_angle) * 350;
+    let inside_y = h_canvas / 2 + -Math.cos(inside_angle) * 300;
 
     //Gets the displacement
     let movement_x = inside_x - outside_x;
     let movement_y = inside_y - outside_y;
 
 
-    //Calculates the angle given the displacement
-    var angle;
-    if(movement_x > 0){
-        angle = Math.atan(movement_y/movement_x) + Math.PI/2;
-    }
-    else{
-        angle = Math.atan(movement_y/movement_x) + 3 * Math.PI / 2;
-    }
+    //Calculates the angle given the displacement from the tan using the atan2 function
+    let angle = Math.atan2(movement_y, movement_x) + Math.PI / 2;
 
-    console.log("outside", outside_angle, "inside", inside_angle, "outx", outside_x, "outy", outside_y, "inx", inside_x, "iny", inside_y, "movx", movement_x, "movy", movement_y, "angle", angle);
+    //console.log("outside", outside_angle, "inside", inside_angle, "outx", outside_x, "outy", outside_y, "inx", inside_x, "iny", inside_y, "movx", movement_x, "movy", movement_y, "angle", angle);
 
-    asteroids.push(new Asteroid(outside_x, outside_y, 2, angle, 1));
+    return new Asteroid(outside_x, outside_y, velocity, angle, size);
 
 }
 
+function CalcLevel() {
+    let max_asteroids = asteroids_initial + Math.floor(score / 10000) * difficulty; //Each 10000 points will have "difficulty" more asteroids in game
+    while (asteroids.length < max_asteroids) {
+        //console.log("increasing");
+        let size = CalcSize();
+        let velocity = CalcVelocity();
+        let asteroid = CreateAsteroid(size, velocity);
+        asteroids.push(asteroid);
+
+    }
+}
+
+function CalcSize() {
+    let max_size = Math.log((score+1000) / 1000) ; //The max size of the asteroid is based of the score
+    return Math.floor(Math.random() * max_size) + 1;
+}
+
+function CalcVelocity() {
+    let max_velocity = (Math.log((score+500) / 500) + 2) / 2; //the max velocity of the asteroid is based on the score
+    return Math.floor(Math.random() * max_velocity) + 1;
+}
+
+last_time = new Date();//Gets the time as soon as possible before starting the game
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
 window.requestAnimationFrame(loop);
