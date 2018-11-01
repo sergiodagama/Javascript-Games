@@ -7,11 +7,13 @@ var difficulty = 5;
 var last_time;
 var score_multiplier = 0.2;
 var score = 0;
+var total_score = 0;
+var total_score_width;
 
 var asteroids = [];
 var asteroids_initial = 20;
-var asteroids_destroyed;
-var asteroids_outofbondaries;
+var asteroids_destroyed = 0;
+var asteroids_bonus = 1000; //Gives 1000 for each asteroid destroyed
 
 var bullets = [];
 
@@ -112,7 +114,7 @@ controller = {
 
     keyListener: function (event) {
         var key_state = event.type == "keydown" ? true : false;
-        var shooting_state = event.type == "keyup" ? true: false;
+        var shooting_state = event.type == "keyup" ? true : false;
 
         switch (event.keyCode) {
             case 65: //a key
@@ -125,7 +127,7 @@ controller = {
                 controller.right = key_state;
                 break;
             case 32: //Space key
-                if(shooting_state) bullets.push(new Bullet(player.x, player.y, player.direction));
+                if (shooting_state && !gameover) bullets.push(new Bullet(player.x, player.y, player.direction));
                 console.log(bullets);
                 break;
         }
@@ -146,6 +148,9 @@ class Asteroid {
         this.x_velocity = velocity * Math.sin(direction);
     }
 
+    get direction() {
+        return Math.atan2(this.y_velocity, this.x_velocity) + Math.PI / 2;
+    }
 
     print() {
         context.fillStyle = "#1f180c";
@@ -221,35 +226,64 @@ function CalcAsteroids() {
 
         //Check for collision with the player
         let collided = asteroid.collision(player.x, player.y, player.player_hitbox);
-        if(collided) gameover = true;
+        if (collided) {
+            gameover = true;
+            total_score = score + asteroids_destroyed * asteroids_bonus;
+            context.font = "25px Arial";
+            total_score_width = context.measureText(total_score).width; //Measures the width of the text - used to center the score
+        }
 
         //Check for collision with bullets
         let destroyed = false;
-        for(var bullet of bullets){
+        for (var bullet of bullets) {
             destroyed = destroyed || asteroid.collision(bullet.x, bullet.y, player.bullet_size);
-            if(destroyed){//If there was a collision there is no need to check other bullets for the same asteroid
+            if (destroyed) {//If there was a collision there is no need to check other bullets for the same asteroid
                 let i = bullets.indexOf(bullet);
                 bullets.splice(i, 1); //Deletes the bullet from the array
+                break; //There is no need to check the other bullets
             }
         }
 
         //Check if the asteroid has left the screen
         let outofbonds = asteroid.outofbondaries();
 
-        if (outofbonds || destroyed) {
+        if (outofbonds) { //Adds a new asteroid after one got out of the screen
 
-            //Adds a new asteroid after one got out of the screen of destroyed
-            let idx = asteroids.indexOf(asteroid);
-            if (idx !== -1) {
-                //console.log("new one needed");
-                let size = CalcSize();
-                let velocity = CalcVelocity();
-                asteroid = CreateAsteroid(size, velocity);
-                //console.log("asteroid");
-                asteroids[idx] = asteroid;
-                //console.log(asteroids[idx]);
-            }
+            RecreateAsteroid(asteroid);
         }
+        if (destroyed) { //Splits the asteroids after one was destroyed
+
+            asteroids_destroyed++;
+
+            if (asteroid.size > 1) { //It is not the smallest asteroid
+                //console.log("fullfilled");
+                //console.log(asteroid.direction);
+                let asteroid1 = new Asteroid(asteroid.x, asteroid.y, asteroid.velocity, asteroid.direction + Math.PI / 6, asteroid.size - 1);
+                let asteroid2 = new Asteroid(asteroid.x, asteroid.y, asteroid.velocity, asteroid.direction - Math.PI / 6, asteroid.size - 1);
+                let idx = asteroids.indexOf(asteroid);
+                if (idx !== -1) {
+                    asteroids[idx] = asteroid1;
+                    asteroids.push(asteroid2);
+                }
+            }
+            else { //The asteroid got totally destroyed
+                RecreateAsteroid(asteroid);
+            }
+
+        }
+    }
+}
+
+function RecreateAsteroid(asteroid) { //An asteroid needs to be remade
+    let idx = asteroids.indexOf(asteroid);
+    if (idx !== -1) {
+        //console.log("new one needed");
+        let size = CalcSize();
+        let velocity = CalcVelocity();
+        asteroid = CreateAsteroid(size, velocity);
+        //console.log("asteroid");
+        asteroids[idx] = asteroid;
+        //console.log(asteroids[idx]);
     }
 }
 
@@ -266,16 +300,18 @@ function CalcBullets() {
             let idx = bullets.indexOf(bullet);
             if (idx !== -1) {
                 bullets.splice(idx, 1);
-                console.log(bullets);
+                //console.log(bullets);
             }
         }
     }
 }
 
-//Create the initial ammount of Asteroids
-for (var i = 0; i < asteroids_initial; i++) {
-    let asteroid = CreateAsteroid();
-    asteroids.push(asteroid);
+function InitialAsteroids() {
+    //Create the initial ammount of Asteroids
+    for (var i = 0; i < asteroids_initial; i++) {
+        let asteroid = CreateAsteroid();
+        asteroids.push(asteroid);
+    }
 }
 //console.log("all good");
 
@@ -297,11 +333,20 @@ function loop() {
         score += parseInt((this_time - last_time) * score_multiplier);
         last_time = this_time; //Updates the time
 
-    }
+        //Instant Score Print
+        context.fillStyle = "#ffffff";
+        context.font = "10px Arial";
+        context.fillText(score, w_canvas - 50, 20, 50);
 
-    //Score Print
-    context.fillStyle = "#ffffff";
-    context.fillText(score, w_canvas - 50, 20, 50);
+    }
+    else {
+
+        //Final Score Print
+        context.fillStyle = "#ffffff";
+        context.font = "25px Arial";
+        context.fillText(total_score, w_canvas / 2 - total_score_width / 2, h_canvas / 2);
+
+    }
 
     CalcBullets();
     CalcAsteroids();
@@ -361,6 +406,7 @@ function CalcVelocity() {
     return Math.floor(Math.random() * max_velocity) + 1;
 }
 
+InitialAsteroids();
 last_time = new Date();//Gets the time as soon as possible before starting the game
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
