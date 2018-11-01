@@ -8,7 +8,7 @@ var last_time;
 var score_multiplier = 0.2;
 var score = 0;
 var total_score = 0;
-var total_score_width;
+var total_score_width = 0;
 
 var asteroids = [];
 var asteroids_initial = 20;
@@ -20,6 +20,10 @@ var bullets = [];
 context = document.querySelector("canvas").getContext("2d");
 context.canvas.width = w_canvas;
 context.canvas.height = h_canvas;
+
+var gameover_text = "Press ENTER to restart";
+context.font = "25px Arial";
+var gameover_text_width = context.measureText(gameover_text).width;
 
 player = {
     x: w_canvas / 2,
@@ -130,6 +134,8 @@ controller = {
                 if (shooting_state && !gameover) bullets.push(new Bullet(player.x, player.y, player.direction));
                 console.log(bullets);
                 break;
+            case 13:
+                if(gameover && !key_state) Reset();
         }
     }
 
@@ -344,7 +350,8 @@ function loop() {
         //Final Score Print
         context.fillStyle = "#ffffff";
         context.font = "25px Arial";
-        context.fillText(total_score, w_canvas / 2 - total_score_width / 2, h_canvas / 2);
+        context.fillText(total_score, w_canvas / 2 - total_score_width/2, h_canvas / 2);
+        context.fillText(gameover_text, w_canvas/2 - gameover_text_width/2, h_canvas/2 + 30);
 
     }
 
@@ -394,6 +401,26 @@ function CalcLevel() {
         asteroids.push(asteroid);
 
     }
+}
+
+function Reset() {
+    gameover = false;
+    last_time;
+    score_multiplier = 0.2;
+    score = 0;
+    total_score = 0;
+    total_score_width = 0;
+
+    asteroids = [];
+    asteroids_destroyed = 0;
+
+    bullets = [];
+
+    player.x = w_canvas / 2;
+    player.y = h_canvas / 2;
+    player.velocity = 0;
+
+    InitialAsteroids();
 }
 
 function CalcSize() {
