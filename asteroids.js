@@ -2,6 +2,9 @@ var player, controller;
 var w_canvas = 800;
 var h_canvas = 500;
 
+var name;
+var highscores = [[null, null]];
+
 var gameover = false;
 var difficulty = 5;
 var last_time;
@@ -237,6 +240,7 @@ function CalcAsteroids() {
             total_score = score + asteroids_destroyed * asteroids_bonus;
             context.font = "25px Arial";
             total_score_width = context.measureText(total_score).width; //Measures the width of the text - used to center the score
+
         }
 
         //Check for collision with bullets
