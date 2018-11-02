@@ -314,10 +314,12 @@ function CalcBullets() {
 
 function InitialAsteroids() {
     //Create the initial ammount of Asteroids
+    asteroids = [];
     for (var i = 0; i < asteroids_initial; i++) {
         let asteroid = CreateAsteroid();
         asteroids.push(asteroid);
     }
+    last_time = new Date();//Gets the time as soon as possible before starting the game
 }
 //console.log("all good");
 
@@ -434,7 +436,6 @@ function CalcVelocity() {
 }
 
 InitialAsteroids();
-last_time = new Date();//Gets the time as soon as possible before starting the game
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
 window.requestAnimationFrame(loop);
