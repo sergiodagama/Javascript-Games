@@ -25,7 +25,7 @@ img3.src = "https://vignette.wikia.nocookie.net/nintendo/images/3/3e/MTO_Tennis_
 var img4 =  new Image();
 img4.src = "https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Summer-Vacation-PNG/Beach_Ball_PNG_Vector_Clipart.png?m=1507172108";
 var img5 = new Image();  //easter eggs
-img5.src = "rockstar.png";
+img5.src = "https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2Frockstar.png?1542226137811";
 var img7 = new Image();
 img7.src = "https://img.ibxk.com.br/2014/11/24/24130515384285.jpg";
 var img8 = new Image();
@@ -33,10 +33,10 @@ img8.src = "https://scontent.fopo3-1.fna.fbcdn.net/v/t1.0-9/18221616_14973650936
 var img9 = new Image();
 img9.src = "https://www.gannett-cdn.com/presto/2018/08/06/USAT/d7e9198a-b2fa-4ca6-b947-31c3751cc248-GettyImages-898660948.jpg?crop=5369,3020,x0,y0&width=3200&height=1680&fit=bounds";  //end of easter eggs
                         
-var hitAudio = new Audio("hit.mp3");
-var pointAudio = new Audio("point.mp3");
-var winAudio = new Audio("win.mp3");
-var gameAudio = new Audio("Bank.mp3");
+var hitAudio = new Audio("https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2Fhit.mp3?1542226125437");
+var pointAudio = new Audio("https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2Fpoint.mp3?1542226126236");
+var winAudio = new Audio("https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2Fwin.mp3?1542226133751");
+var gameAudio = new Audio("https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2FBank.mp3?1542226172173");
 gameAudio.volume = 0.6;
 
 ctx = document.querySelector("canvas").getContext("2d");
@@ -80,7 +80,7 @@ class Button {
     this.x = x;
     this.y = y;
     this.color = color;
-	this.disable = false;
+	  this.disable = false;
   }
 
   clicked() {
@@ -610,8 +610,8 @@ function mainMenu() {
     button1.draw();
     button2.draw();
     button3.draw();
-	button10.draw();
-	button11.draw();
+	  button10.draw();
+	  button11.draw();
 	  if(button10.clicked()){
 		  twoPlayers = false;
 	  }
@@ -621,7 +621,7 @@ function mainMenu() {
     if (button1.clicked()) {
 	  Init();
 	  if(name2 == "Tiago" || name1 == "Tiago"){  //easter egg
-		 gameAudio.src = "9Dminor.mp3";
+		 gameAudio.src = "https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2F9Dminor.mp3?1542226201084";
 		 gameAudio.currentTime = 120;
 		 gameAudio.play();
 		  ctx.clearRect(0, 0, w_width, 500);
@@ -630,7 +630,7 @@ function mainMenu() {
 
       } 
 	  if(name2 == "Noil" || name1 == "Noil"){  
-		 gameAudio.src = "rockstar.mp3";
+		 gameAudio.src = "https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2Frockstar.mp3?1542226168372";
 		 gameAudio.currentTime = 0;
 		 gameAudio.play();
 		  ctx.clearRect(0, 0, w_width, 500);
@@ -639,7 +639,7 @@ function mainMenu() {
 
       }  //end of easter egg
 	  if(name2 != "Tiago" && name2 != "Noil" && name2 != undefined){
-	  gameAudio.src = "Bank.mp3";
+	  gameAudio.src = "https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2FBank.mp3?1542226172173";
 	  gameAudio.play();
 	  ctx.clearRect(0, 0, w_width, 500);
       start = true;
