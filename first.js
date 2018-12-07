@@ -314,13 +314,6 @@ class obs {
 
 }
 
-class block extends obs{
-	
-	constructor(x, y, width, height, color){
-		super(x, y, width, height, color);
-	}
-}
-
 class checkpoint extends obs{
 	constructor(x, y, width, height, color){
 		super(x, y, width, height, color);
@@ -402,7 +395,7 @@ function GetObstacles() {
 	switch (level) {
 		case 0:
 			for (var i = 0; i < 5; i++) {
-				obsArray.push(new block(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));
+				obsArray.push(new obs(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));
 			}
 			obsCheckpoint = new checkpoint(600, 120, 15, 76, "grey");
 
