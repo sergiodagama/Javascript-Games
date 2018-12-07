@@ -177,7 +177,7 @@ class Player {
                     //Deletes the bullet that got out of the screens
                     let idx = this.bullets.indexOf(bullet);
                     if (idx !== -1) {
-                        console.log("Deleting bullet");
+                        //console.log("Deleting bullet");
                         this.bullets.splice(idx, 1);
                         //console.log(bullets);
                     }
@@ -242,7 +242,7 @@ function menu() {
 
     printMain();
 
-    console.log("gameovers", red.gameover, green.gameover);
+    //console.log("gameovers", red.gameover, green.gameover);
     context.fillStyle = "#ffffff";
     context.font = '25px Arial';
     let intro = "Spaceships 2P";
@@ -253,17 +253,17 @@ function menu() {
     printSecond();
 
     let interval = setInterval(function () {
-        console.log("gameovers", red.gameover, green.gameover);
+        //console.log("gameovers", red.gameover, green.gameover);
 
         if (red.initialized) {
             context.fillStyle = '#000000';
             context.fillRect(0, h_canvas / 2 - 30, w_canvas / 2, h_canvas / 2);
-            console.log("Neeed to clear");
+            //console.log("Neeed to clear");
         }
         if (green.initialized) {
             context.fillStyle = '#000000';
             context.fillRect(w_canvas / 2, h_canvas / 2 - 30, w_canvas / 2, h_canvas / 2);
-            console.log("Neeed to clear");
+            //console.log("Neeed to clear");
         }
         if (green.initialized && green.initialized) { //Both players are in the game
             clearInterval(interval);
@@ -326,11 +326,11 @@ function keyListener(event) {
             break;
         case 16: //Shift key
             if (shooting_state && !red.gameover) red.bullets.push(new Bullet(red.x, red.y, red.direction, red.x_velocity, red.y_velocity, red.color));
-            console.log("red shot", red.bullets);
+            //console.log("red shot", red.bullets);
             break;
         case 17: //Control key
             if (red.gameover && key_state) {
-                console.log("Should have restarted");
+                //console.log("Should have restarted");
                 red.initialize();
             }
             if (!red.initialized) red.initialized = true;

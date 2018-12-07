@@ -1,7 +1,7 @@
 //Independently developed in https://github.com/henriquecscode/snake
 
-h_canvas = 500;
-w_canvas = 900;
+var h_canvas = 500;
+var w_canvas = 900;
 
 context = document.querySelector("canvas").getContext("2d");
 context.canvas.height = h_canvas;
