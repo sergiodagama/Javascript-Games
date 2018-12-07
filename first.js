@@ -31,7 +31,7 @@ rectangle = {
 
 class obs {
 
-	constructor(x, y, width, height, color) {
+	constructor(x, y, width, height, color = "#af4112") {
 		this.width = width;
 		this.height = height;
 		this.x = x;
@@ -317,13 +317,28 @@ class obs {
 class checkpoint extends obs{
 	constructor(x, y, width, height, color){
 		super(x, y, width, height, color);
-		console.log("created a checkpoitn");
+		//console.log("created a checkpoitn");
 	}
 
 	passLevel(){
 
 		if(this.collision){ //If the player it the portal
-			NextLevel();
+			passLevel();
+		}
+	}
+}
+
+class restarter extends obs{
+	constructor(x, y, width, height, color){
+		super(x, y, width, heigh, color);
+		
+	}
+
+	restartLevel(){
+
+		if(this.collision){
+			rectangle.x = w_canvas/10;
+			rectangle.y = h_canvas/4 * 3; //Don't want it to fall from the top;
 		}
 	}
 }
@@ -392,24 +407,29 @@ function Gravity() {
 
 function GetObstacles() {
 	//obstacles per level
+	obsArray = [];
 	switch (level) {
-		case 0:
+		/*case 0:
 			for (var i = 0; i < 5; i++) {
 				obsArray.push(new obs(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));
 			}
 			obsCheckpoint = new checkpoint(600, 120, 15, 76, "grey");
 
 			break;
-
+*/
 		//Add new levels here
-		case 1:
-
+		case 0:
+		obsArray.push(new obs(100, 300, 30, 400));
+		obsArray.push(new obs(100, 0, 30, 200));
+		obsArray.push(new obs(200, 200, 50, 20));
+		obsArray.push(new obs(300, 100, 50, 20));
+		obsCheckpoint = new checkpoint(600, 400, 15, 70, "grey");
 			break;
 
 	}
 }
 
-function NextLevel(){
+function passLevel(){
 	level ++;
 	GetObstacles();
 	rectangle.x = w_canvas/10;
