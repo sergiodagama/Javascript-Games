@@ -6,6 +6,7 @@ var impulse = 25,
 var level = 0,
 	isOnTop = false;
 var obsArray = [];
+var obsCheckpoint;
 
 context = document.querySelector("canvas").getContext("2d");
 
@@ -61,8 +62,8 @@ class obs {
 		if (rectangle.right > this.left && rectangle.right < this.right && rectangle.bottom > this.top && rectangle.bottom < this.bottom) {
 			//If the bot right of the rectangle has hit an obstacle
 
-			console.log(rectangle.bottom > this.top && rectangle.bottom < this.bottom)
-			console.log("bot right collision");
+			//console.log(rectangle.bottom > this.top && rectangle.bottom < this.bottom)
+			//console.log("bot right collision");
 
 			if (rectangle.x_velocity === 0) {//It just fell down
 				this.collision = 'bottom' //The bottom of the rectagle collided
@@ -111,48 +112,48 @@ class obs {
 		else if (rectangle.left > this.left && rectangle.left < this.right && rectangle.bottom > this.top && rectangle.bottom < this.bottom) {
 			//If the bot left of the rectangle has hit an obstacle
 
-				console.log(rectangle.bottom < this.bottom);
-				console.log("bot left collision");
+			//console.log(rectangle.bottom < this.bottom);
+			//console.log("bot left collision");
 
-				if (rectangle.x_velocity === 0) {//It just fell down
-					this.collision = 'bottom' //The bottom of the rectagle collided
+			if (rectangle.x_velocity === 0) {//It just fell down
+				this.collision = 'bottom' //The bottom of the rectagle collided
+			}
+
+			else if (rectangle.x_velocity > 0) { //It fell right and down, if there was a collision it must have been on the top
+				this.collision = 'bottom'
+			}
+
+			else if (rectangle.x_velocity < 0) { //It fell left and down, so it might have it the top or the right of the obstacle
+
+				/*if (rectangle.left <= this.right) { //It was already right of the obstacle, so it must have hit the top
+					this.collision = 'bottom';
+				}
+		
+				else if (rectangle.bottom <= this.top) { //It was already bellow the top of the obstacle so it must have hit the left
+					this.collision = 'right';
+				}
+		
+				else { */
+				//We don't know if we hit the top or the right
+				let rectangle_displacement_slope = rectangle.y_velocity / rectangle.x_velocity; //Gets the slope of the movement of the rectangle
+
+				let last_bottom = rectangle.bottom - 10 / 9 * rectangle.y_velocity; //Reverses the position update
+				let last_left = rectangle.left - 10 / 9 * rectangle.x_velocity; //Reverses the position update
+
+				let object_displacement_slope = (last_bottom - rectangle.top) / (last_left - rectangle.right); //Gets the slope that is key to identify if the object goes on top or on the side
+
+				//console.log("object slope is" + object_displacement_slope);
+				//console.log("rectangle slope is " + rectangle_displacement_slope);
+
+				if (object_displacement_slope < rectangle_displacement_slope) { //Side hit
+					this.collision = 'left';
+				}
+				else { //Bottom hit
+					this.collision = 'bottom';
 				}
 
-				else if (rectangle.x_velocity > 0) { //It fell right and down, if there was a collision it must have been on the top
-					this.collision = 'bottom'
-				}
-
-				else if (rectangle.x_velocity < 0) { //It fell left and down, so it might have it the top or the right of the obstacle
-
-					/*if (rectangle.left <= this.right) { //It was already right of the obstacle, so it must have hit the top
-						this.collision = 'bottom';
-					}
-			
-					else if (rectangle.bottom <= this.top) { //It was already bellow the top of the obstacle so it must have hit the left
-						this.collision = 'right';
-					}
-			
-					else { */
-					//We don't know if we hit the top or the right
-					let rectangle_displacement_slope = rectangle.y_velocity / rectangle.x_velocity; //Gets the slope of the movement of the rectangle
-
-					let last_bottom = rectangle.bottom - 10 / 9 * rectangle.y_velocity; //Reverses the position update
-					let last_left = rectangle.left - 10 / 9 * rectangle.x_velocity; //Reverses the position update
-
-					let object_displacement_slope = (last_bottom - rectangle.top) / (last_left - rectangle.right); //Gets the slope that is key to identify if the object goes on top or on the side
-
-					console.log("object slope is" + object_displacement_slope);
-					console.log("rectangle slope is " + rectangle_displacement_slope);
-
-					if (object_displacement_slope < rectangle_displacement_slope) { //Side hit
-						this.collision = 'left';
-					}
-					else { //Bottom hit
-						this.collision = 'bottom';
-					}
-
-					//}
-				}
+				//}
+			}
 
 		}
 
@@ -160,7 +161,7 @@ class obs {
 		else if (rectangle.right > this.left && rectangle.right < this.right && rectangle.top > this.top && rectangle.top < this.bottom) {
 			//If the top right of the rectangle has hit an obstacle
 
-			console.log("top right collision");
+			//console.log("top right collision");
 
 			if (rectangle.x_velocity === 0) {//It just jumped up
 				this.collision = 'top' //The top of the rectagle collided
@@ -189,8 +190,8 @@ class obs {
 
 				let object_displacement_slope = (last_top - rectangle.bottom) / (last_right - rectangle.left); //Gets the slope that is key to identify if the object goes on bottom or on the side
 
-				console.log("object slope is" + object_displacement_slope);
-				console.log("rectangle slope is " + rectangle_displacement_slope);
+				//console.log("object slope is" + object_displacement_slope);
+				//console.log("rectangle slope is " + rectangle_displacement_slope);
 
 				if (object_displacement_slope < rectangle_displacement_slope) { //Side hit
 					this.collision = 'right';
@@ -209,48 +210,48 @@ class obs {
 		else if (rectangle.left > this.left && rectangle.left < this.right && rectangle.top > this.top && rectangle.top < this.bottom) {
 			//If the bot left of the rectangle has hit an obstacle
 
-				console.log(rectangle.top < this.bottom);
-				console.log("top left collision");
+			//console.log(rectangle.top < this.bottom);
+			//console.log("top left collision");
 
-				if (rectangle.x_velocity === 0) {//It just fell down
-					this.collision = 'top' //The bottom of the rectagle collided
+			if (rectangle.x_velocity === 0) {//It just fell down
+				this.collision = 'top' //The bottom of the rectagle collided
+			}
+
+			else if (rectangle.x_velocity > 0) { //It fell right and down, if there was a collision it must have been on the top
+				this.collision = 'top'
+			}
+
+			else if (rectangle.x_velocity < 0) { //It fell left and down, so it might have it the top or the right of the obstacle
+
+				/*if (rectangle.left <= this.right) { //It was already right of the obstacle, so it must have hit the top
+					this.collision = 'bottom';
+				}
+		
+				else if (rectangle.bottom <= this.top) { //It was already bellow the top of the obstacle so it must have hit the left
+					this.collision = 'right';
+				}
+		
+				else { */
+				//We don't know if we hit the top or the right
+				let rectangle_displacement_slope = rectangle.y_velocity / rectangle.x_velocity; //Gets the slope of the movement of the rectangle
+
+				let last_bottom = rectangle.bottom - 10 / 9 * rectangle.y_velocity; //Reverses the position update
+				let last_left = rectangle.left - 10 / 9 * rectangle.x_velocity; //Reverses the position update
+
+				let object_displacement_slope = (last_bottom - rectangle.top) / (last_left - rectangle.right); //Gets the slope that is key to identify if the object goes on top or on the side
+
+				//console.log("object slope is" + object_displacement_slope);
+				//console.log("rectangle slope is " + rectangle_displacement_slope);
+
+				if (object_displacement_slope > rectangle_displacement_slope) { //Side hit
+					this.collision = 'left';
+				}
+				else { //Top hit
+					this.collision = 'top';
 				}
 
-				else if (rectangle.x_velocity > 0) { //It fell right and down, if there was a collision it must have been on the top
-					this.collision = 'top'
-				}
-
-				else if (rectangle.x_velocity < 0) { //It fell left and down, so it might have it the top or the right of the obstacle
-
-					/*if (rectangle.left <= this.right) { //It was already right of the obstacle, so it must have hit the top
-						this.collision = 'bottom';
-					}
-			
-					else if (rectangle.bottom <= this.top) { //It was already bellow the top of the obstacle so it must have hit the left
-						this.collision = 'right';
-					}
-			
-					else { */
-					//We don't know if we hit the top or the right
-					let rectangle_displacement_slope = rectangle.y_velocity / rectangle.x_velocity; //Gets the slope of the movement of the rectangle
-
-					let last_bottom = rectangle.bottom - 10 / 9 * rectangle.y_velocity; //Reverses the position update
-					let last_left = rectangle.left - 10 / 9 * rectangle.x_velocity; //Reverses the position update
-
-					let object_displacement_slope = (last_bottom - rectangle.top) / (last_left - rectangle.right); //Gets the slope that is key to identify if the object goes on top or on the side
-
-					console.log("object slope is" + object_displacement_slope);
-					console.log("rectangle slope is " + rectangle_displacement_slope);
-
-					if (object_displacement_slope > rectangle_displacement_slope) { //Side hit
-						this.collision = 'left';
-					}
-					else { //Top hit
-						this.collision = 'top';
-					}
-
-					//}
-				}
+				//}
+			}
 
 		}
 
@@ -258,29 +259,29 @@ class obs {
 		//isOnTop = false;
 		//collision against obstacles
 		if (this.collision === 'top') {
-			console.log("Top collision"); //debugging
+			//console.log("Top collision"); //debugging
 			rectangle.jumping = true;
 			rectangle.y = this.y + this.height;
 			rectangle.y_velocity = 0;
 		}
 		else if (this.collision === 'bottom') {
-			console.log("Bottom collision"); //debugging
+			//console.log("Bottom collision"); //debugging
 			rectangle.jumping = false;
 			rectangle.y = this.y - rectangle.height;
 			isOnTop = true;
 		}
 		else if (this.collision === 'right') {
-			console.log("Right collision"); //debugging
+			//console.log("Right collision"); //debugging
 			rectangle.x = this.x - rectangle.width;
 			rectangle.x_velocity -= 5;
 		}
 		else if (this.collision === 'left') {
-			console.log("Left collision"); //debugging
+			//console.log("Left collision"); //debugging
 			rectangle.x = this.x + this.width;
 			rectangle.x_velocity += 5;
 		}
 		else if (rectangle.y != this.y - rectangle.height) {
-			console.log("weird condition");
+			//console.log("weird condition");
 			isOnTop = false;
 		}
 
@@ -293,12 +294,12 @@ class obs {
 		} else if (rectangle.x < -rectangle.width && level > 0) {
 			rectangle.x = w_canvas;
 
-			level -= 1;
+			//level -= 1;
 
 			//if rectangle goes past right boundary
 		} else if (rectangle.x > w_canvas) {
 			rectangle.x = -rectangle.width;
-			level += 1;
+			//level += 1;
 		}
 
 		//if rectangle is falling below floor line
@@ -311,6 +312,27 @@ class obs {
 
 	}
 
+}
+
+class block extends obs{
+	
+	constructor(x, y, width, height, color){
+		super(x, y, width, height, color);
+	}
+}
+
+class checkpoint extends obs{
+	constructor(x, y, width, height, color){
+		super(x, y, width, height, color);
+		console.log("created a checkpoitn");
+	}
+
+	passLevel(){
+
+		if(this.collision){ //If the player it the portal
+			NextLevel();
+		}
+	}
 }
 
 controller = {
@@ -375,19 +397,30 @@ function Gravity() {
 	rectangle.y_velocity += 1.5;
 }
 
-//obstacles per level
-switch (level) {
-	case 0:
-		for (var i = 0; i < 5; i++) {
-			obsArray.push(new obs(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));
-		}
-		obsArray.push(new obs(600, 120, 15, 76, "grey"));
+function GetObstacles() {
+	//obstacles per level
+	switch (level) {
+		case 0:
+			for (var i = 0; i < 5; i++) {
+				obsArray.push(new block(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));
+			}
+			obsCheckpoint = new checkpoint(600, 120, 15, 76, "grey");
 
-		break;
-	case 1:
+			break;
 
-		break;
+		//Add new levels here
+		case 1:
 
+			break;
+
+	}
+}
+
+function NextLevel(){
+	level ++;
+	GetObstacles();
+	rectangle.x = w_canvas/10;
+	rectangle.y = 0;
 }
 
 loop = function () {
@@ -397,9 +430,16 @@ loop = function () {
 	}
 
 	DrawMain();
+
+	//Normal objects
 	Movement_Friction_Jumping();
 	obsArray.forEach(obs => obs.drawObs());
 	obsArray.forEach(obs => obs.collisionDetection());
+
+	//For the checkpoint
+	obsCheckpoint.drawObs();
+	obsCheckpoint.collisionDetection();
+	obsCheckpoint.passLevel();
 
 
 
@@ -417,6 +457,7 @@ loop = function () {
 	window.requestAnimationFrame(loop);
 };
 
+GetObstacles(); //Creates the obstacles for the first level
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
 window.requestAnimationFrame(loop);
