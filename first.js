@@ -312,6 +312,8 @@ class obs {
 
 	}
 
+	obsFunction(){} //Empty function
+
 }
 
 class checkpoint extends obs{
@@ -320,7 +322,7 @@ class checkpoint extends obs{
 		//console.log("created a checkpoitn");
 	}
 
-	passLevel(){
+	obsFunction(){
 
 		if(this.collision){ //If the player it the portal
 			passLevel();
@@ -330,11 +332,11 @@ class checkpoint extends obs{
 
 class restarter extends obs{
 	constructor(x, y, width, height, color){
-		super(x, y, width, heigh, color);
+		super(x, y, width, height, color = "red");
 		
 	}
 
-	restartLevel(){
+	obsFunction(){
 
 		if(this.collision){
 			rectangle.x = w_canvas/10;
@@ -413,19 +415,22 @@ function GetObstacles() {
 			for (var i = 0; i < 5; i++) {
 				obsArray.push(new obs(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));
 			}
-			obsCheckpoint = new checkpoint(600, 120, 15, 76, "grey");
+			obsArray.push(new checkpoint(600, 120, 15, 76, "grey"));
 
 			break;
 */
 		//Add new levels here
-		case 0:
+		/*case 1:
 		obsArray.push(new obs(100, 300, 30, 400));
 		obsArray.push(new obs(100, 0, 30, 200));
 		obsArray.push(new obs(200, 200, 50, 20));
 		obsArray.push(new obs(300, 100, 50, 20));
-		obsCheckpoint = new checkpoint(600, 400, 15, 70, "grey");
+		obsArray.push(new restarter(150, 400, 200, 20));
+		obsArray.push(new restarter(350, 250, 100, 20));
+		obsArray.push(new restarter(500, 250, 100, 20));
+		obsArray.push( new checkpoint(600, 350, 15, 70, "grey"));
 			break;
-
+			*/
 	}
 }
 
@@ -448,11 +453,7 @@ loop = function () {
 	Movement_Friction_Jumping();
 	obsArray.forEach(obs => obs.drawObs());
 	obsArray.forEach(obs => obs.collisionDetection());
-
-	//For the checkpoint
-	obsCheckpoint.drawObs();
-	obsCheckpoint.collisionDetection();
-	obsCheckpoint.passLevel();
+	obsArray.forEach(obs => obs.obsFunction()); //For the objects that have a special function
 
 
 
