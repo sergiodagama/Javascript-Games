@@ -1,0 +1,15 @@
+Version 1.0 | 4 bugs unfixed |
+-----------------------------------------------------------------------------------
+- Repeat button works at first, but then it keeps repeating over and over 
+(if clicked multiple times when win screen appears it works and stop repeating)
+
+- Collision against top of players isn't being considered
+
+- Collision against the corners of the top left and right top wall and left and 
+rigt down wall ins't being considered as well
+
+- If collision is too fast the hitAudio is not played twice
+
+- Due to the movement of the ball, if the player stays still the ball can enter in
+a infinite loop of back and forward against the AI
+-----------------------------------------------------------------------------------
