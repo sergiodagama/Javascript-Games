@@ -75,17 +75,16 @@ function OrganicMatterUpdate() {
     let h_stats = 70
     for(var life_form of life_forms){
         if(organic_matter >= life_form.price || life_form.amount > 0){
-        context.fillText(life_form.name + '- Amount: ' + life_form.amount + ' Price: ' + life_form.price, 320, h_stats);
-        h_stats +=15;
+          context.fillText(life_form.name + '- Amount: ' + life_form.amount + ' Price: ' + life_form.price, 320, h_stats);
+          h_stats +=15;
         }
         else{
-            context.fillText(life_form.name + '- Amount: ' + life_form.amount + ' Price: ' + life_form.price, 320, h_stats);
-            h_stats +=15;
-            break;
+          context.fillText(life_form.name + '- Amount: ' + life_form.amount + ' Price: ' + life_form.price, 320, h_stats);
+          h_stats +=15;
+          break;
         }
     }
 }
-
 
 //Menus classes
 class Utility {
