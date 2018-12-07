@@ -280,65 +280,36 @@ class obs {
 			rectangle.x = this.x + this.width;
 			rectangle.x_velocity += 5;
 		}
-		else if (rectangle.y != this.y - rectangle.height) {
-			//console.log("weird condition");
-			isOnTop = false;
-		}
-
-		//detection of left wall at level 0
-
-		if (level == 0 && rectangle.x < 0) {
-			rectangle.x = 0;
-
-			//if rectangle is going off the left of the screen
-		} else if (rectangle.x < -rectangle.width && level > 0) {
-			rectangle.x = w_canvas;
-
-			//level -= 1;
-
-			//if rectangle goes past right boundary
-		} else if (rectangle.x > w_canvas) {
-			rectangle.x = -rectangle.width;
-			//level += 1;
-		}
-
-		//if rectangle is falling below floor line
-		if (rectangle.y > h_canvas - h_floor - rectangle.height - 5) {
-			rectangle.jumping = false;
-			isOnTop = true;
-			rectangle.y = h_canvas - h_floor - rectangle.height - 5;
-			rectangle.y_velocity = 0;
-		}
 
 	}
 
 }
 
-class checkpoint extends obs{
-	constructor(x, y, width, height, color){
+class checkpoint extends obs {
+	constructor(x, y, width, height, color) {
 		super(x, y, width, height, color);
 		//console.log("created a checkpoitn");
 	}
 
-	passLevel(){
+	passLevel() {
 
-		if(this.collision){ //If the player it the portal
+		if (this.collision) { //If the player it the portal
 			passLevel();
 		}
 	}
 }
 
-class restarter extends obs{
-	constructor(x, y, width, height, color){
+class restarter extends obs {
+	constructor(x, y, width, height, color) {
 		super(x, y, width, heigh, color);
-		
+
 	}
 
-	restartLevel(){
+	restartLevel() {
 
-		if(this.collision){
-			rectangle.x = w_canvas/10;
-			rectangle.y = h_canvas/4 * 3; //Don't want it to fall from the top;
+		if (this.collision) {
+			rectangle.x = w_canvas / 10;
+			rectangle.y = h_canvas / 4 * 3; //Don't want it to fall from the top;
 		}
 	}
 }
@@ -365,6 +336,8 @@ controller = {
 };
 
 function Movement_Friction_Jumping() {
+
+	console.log("main movement");
 	if (controller.up && rectangle.jumping == false) {
 		rectangle.y_velocity = -impulse;
 		rectangle.jumping = true;
@@ -383,6 +356,38 @@ function Movement_Friction_Jumping() {
 	rectangle.y += rectangle.y_velocity;
 	rectangle.x_velocity *= 0.9; //friction
 	rectangle.y_velocity *= 0.9; //friction
+}
+
+function MainCollision() {
+	//detection of left wall at level 0
+
+	if (level == 0 && rectangle.x < 0) {
+		rectangle.x = 0;
+
+		//if rectangle is going off the left of the screen
+	} else if (rectangle.x < -rectangle.width && level > 0) {
+		rectangle.x = w_canvas;
+
+		//level -= 1;
+
+		//if rectangle goes past right boundary
+	} else if (rectangle.x > w_canvas) {
+		rectangle.x = -rectangle.width;
+		//level += 1;
+	}
+
+	else if (rectangle.y != this.y - rectangle.height) {
+		//console.log("weird condition");
+		isOnTop = false;
+	}
+
+	//if rectangle is falling below floor line
+	if (rectangle.y > h_canvas - h_floor - rectangle.height - 5) {
+		rectangle.jumping = false;
+		isOnTop = true;
+		rectangle.y = h_canvas - h_floor - rectangle.height - 5;
+		rectangle.y_velocity = 0;
+	}
 }
 
 function DrawMain() {
@@ -409,30 +414,30 @@ function GetObstacles() {
 	//obstacles per level
 	obsArray = [];
 	switch (level) {
-		/*case 0:
+		case 0:
 			for (var i = 0; i < 5; i++) {
 				obsArray.push(new obs(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));
 			}
 			obsCheckpoint = new checkpoint(600, 120, 15, 76, "grey");
 
 			break;
-*/
-		//Add new levels here
-		case 0:
-		obsArray.push(new obs(100, 300, 30, 400));
-		obsArray.push(new obs(100, 0, 30, 200));
-		obsArray.push(new obs(200, 200, 50, 20));
-		obsArray.push(new obs(300, 100, 50, 20));
-		obsCheckpoint = new checkpoint(600, 400, 15, 70, "grey");
-			break;
 
+		//Add new levels here
+		/*case 0:
+			obsArray.push(new obs(100, 300, 30, 400));
+			obsArray.push(new obs(100, 0, 30, 200));
+			obsArray.push(new obs(200, 200, 50, 20));
+			obsArray.push(new obs(300, 100, 50, 20));
+			obsCheckpoint = new checkpoint(600, 400, 15, 70, "grey");
+			break;
+*/
 	}
 }
 
-function passLevel(){
-	level ++;
+function passLevel() {
+	level++;
 	GetObstacles();
-	rectangle.x = w_canvas/10;
+	rectangle.x = w_canvas / 10;
 	rectangle.y = 0;
 }
 
@@ -454,7 +459,7 @@ loop = function () {
 	obsCheckpoint.collisionDetection();
 	obsCheckpoint.passLevel();
 
-
+	MainCollision();
 
 	//show level on screen
 	context.fillStyle = "#ffffff";
