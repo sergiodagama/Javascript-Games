@@ -17,11 +17,7 @@ var gameover = false;
 var level = 1;
 var level_score = 50;
 
-//Initialize the tiles
-for (var i = 0; i < vertical_tiles; i++) {
-    tiles[i] = Math.floor(Math.random() * horizontal_tiles);
-}
-console.log(tiles);
+Initialize(); //Initialize the tiles
 
 //Initialize canvas
 context = document.querySelector("canvas").getContext("2d");
@@ -62,6 +58,10 @@ controller = {
                     controller.tile = 3;
                     RandomizeTiles();
                     break;
+                    default:
+                        Reset();
+                        break;
+
 
             }
         }
@@ -80,7 +80,7 @@ controller = {
             var x = event.pageX - x_canvas;
             var y = event.pageY - y_canvas;
 
-            if(x < 0 || x > w_canvas || y < 0 || y > h_canvas) return //Outside of the boundaries
+            if (x < 0 || x > w_canvas || y < 0 || y > h_canvas) return //Outside of the boundaries
 
             //console.log(x + "total x");
             controller.tile = (x - (x % w_tiles)) / w_tiles; //The controller.tile depends on the collumn that the mouse click is on
@@ -110,6 +110,26 @@ window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
 window.addEventListener("mousedown", controller.keyListener);
 window.requestAnimationFrame(loop);
+
+
+function Initialize() {
+    //Initialize the tiles
+    for (var i = 0; i < vertical_tiles; i++) {
+        tiles[i] = Math.floor(Math.random() * horizontal_tiles);
+    }
+
+    //console.log(tiles);
+
+}
+
+function Reset() {
+    if (gameover == true) {
+        gameover = false;
+        Initialize();
+        controller.score = 0;
+        level = 1;
+    }
+}
 
 function DrawMain() {
 
