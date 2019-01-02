@@ -1,5 +1,5 @@
 var context, controller, loop;
-var h_canvas = 600, w_canvas = 400;
+var h_canvas = 400, w_canvas = 400;
 var vertical_tiles = 4; //How many tiles are shown vertically
 var horizontal_tiles = 4; //How many tiles are shown horizontally
 var tiles = [];
