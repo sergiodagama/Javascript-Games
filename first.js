@@ -431,7 +431,10 @@ function GetObstacles() {
 		obsArray.push(new restarter(500, 250, 100, 20));
 		obsArray.push( new checkpoint(600, 350, 15, 70, "grey"));
 			break;
-			
+		
+		default:
+		obsArray.push(new obs(0,0,10,10));
+			break;
 	}
 }
 
@@ -439,7 +442,7 @@ function passLevel(){
 	level ++;
 	GetObstacles();
 	rectangle.x = w_canvas/10;
-	rectangle.y = 0;
+	rectangle.y = rectangle.y = h_canvas/4 * 3; //Don't want it to fall from the top;;
 }
 
 loop = function () {
