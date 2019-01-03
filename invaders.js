@@ -204,10 +204,12 @@ class Player extends obj {
     }
 
     movement() {
-        if (controller.left) {
+        if (controller.left && this.x > 100) {
+            console.log('is going left')
             this.x -= player.speed;
         }
-        if (controller.right) {
+        if (controller.right && this.x < w_canvas - 100) {
+            console.log('is going right');
             this.x += player.speed;
         }
     }
@@ -226,7 +228,6 @@ class Mother extends Enemy {
     constructor(image) {
         super(w_canvas / 2, 30, mother.width, mother.height, mother.hp, image, mother.shot_speed, mother.difficulty);
         this.goal_x = this.newgoal()
-        console.log(this.goal_x);
     }
 
     spawn() {
