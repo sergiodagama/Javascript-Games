@@ -6,9 +6,12 @@ var timeout = 1000 / FPS;
 
 var player, controller, mother, enemy, entities = [];
 
-var path = 'C:/Henrique/Programming_Learning/Programs/HTML/JSGames/data/invaders/';
-var extension = '.png';
-var link = ["enemy", "mother", "player"];
+var path = '';
+var extension = '';
+var link = ["https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2Fenemy.png?1546451061509",
+            "https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2Fmother.png?1546451061675",
+            "https://cdn.glitch.com/b275ef3e-4b0a-450d-afb8-353e303a2835%2Fplayer.png?1546451061626"];
+
 var images = [];
 var loaded = false;
 
@@ -21,7 +24,7 @@ context.canvas.height = h_canvas;
 mother = {
     width: 50,
     height: 30,
-    hp: 30,
+    hp: 1,
     shot_speed: 2,
     speed: 2,
     difficulty: 3,
@@ -33,7 +36,7 @@ mother = {
 enemy = {
     width: 30,
     height: 30,
-    hp: 3,
+    hp: 30,
     shot_speed: 1,
     difficulty: 0.1,
     grid: [],
@@ -44,6 +47,8 @@ enemy = {
 }
 
 player = {
+    gameover: false,
+    win: false,
     width: 20,
     height: 10,
     hp: 15,
@@ -79,7 +84,7 @@ controller = {
                 if (shooting_state && !player.gameover) controller.shooting = true;
                 break;
             case 13:
-                if (player.player != entities[0] && !key_state) Initialize();
+                if ((player.gameover || player.win) && !key_state) Initialize();
         }
 
     }
@@ -130,18 +135,28 @@ class obj {
             this.hp--;
             if (this.hp == 0) { //Obj died
 
-                //Removes it from the grid of enemies
-                for (let i = 0; i < enemy.grid_x; i++) {
-                    for (let j = enemy.grid_y - 1; j >= 0; j--) {
-                        let coords = gridToCoord(i, j);
-                        let absx = coords.x;
-                        let absy = coords.y;
-                        if (this.x == absx && this.y == absy) {
-                            enemy.grid[j][i] = 0;
-                            i = enemy.grid_x;
-                            j = -1;
+                if(this == player.player){ //The enemy is the player
+                    player.gameover = true;
+                }
+
+                else if (this != mother.mother) { //The object was a normal enemy
+                    //Removes it from the grid of enemies
+                    for (let i = 0; i < enemy.grid_x; i++) {
+                        for (let j = enemy.grid_y - 1; j >= 0; j--) {
+                            let coords = gridToCoord(i, j);
+                            let absx = coords.x;
+                            let absy = coords.y;
+                            if (this.x == absx && this.y == absy) {
+                                enemy.grid[j][i] = 0;
+                                i = enemy.grid_x;
+                                j = -1;
+                            }
                         }
                     }
+                }
+
+                else { //The enemy is the mother
+                    player.win = true;
                 }
 
                 //Removes it from the entities
@@ -231,6 +246,7 @@ class Mother extends Enemy {
     }
 
     spawn() {
+        if(player.win) return //If the player has already won,the mother is dead so won't be able to spawn more enemies
         let enemy_number = entities.length - 2;
         if (enemy_number < enemy.grid_x * enemy.grid_y * mother.spawning_ratio) { //We have less enemies than the ones we want
 
@@ -390,6 +406,9 @@ function createEnemies() {
 
 function Initialize() {
     entities = [];
+
+    player.gameover = false;
+    player.win = false;
     player.player = new Player(player.image);
     mother.mother = new Mother(mother.image);
     entities.push(player.player, mother.mother);
@@ -410,7 +429,16 @@ function main() {
             entity.newshot();
         }
 
-        if (player.player == entities[0]) {
+        if (player.win) { //If the player has killed the mother ship
+            if (entities.length > 1) { //If there are still enemies
+                entities.splice(-1, 1);
+            }
+            else {
+            }
+        }
+
+        if (!player.gameover) {
+            console.log('is playing');
             calcPlayerShots();
             calcAlienShots();
 
