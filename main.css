@@ -30,7 +30,7 @@ p {
 .vertical-menu {
     width: 220px;
     line-height: 50px;
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
 }
