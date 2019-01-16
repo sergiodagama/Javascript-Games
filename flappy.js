@@ -19,9 +19,11 @@ var flappy = {
     y: h_canvas / 2,
     size: 5,
     y_velocity: 0,
-    gravity: 0.25,
+    gravity: 0.4,
     impulse: 5,
+    in_range: false,
     gameover: false,
+    score: 0,
     gameover_text: "Game over. ENTER to restart",
 
     Draw: function () {
@@ -47,6 +49,7 @@ var flappy = {
 
     Jump: function (e) {
         if (e.keyCode == 32) {
+            if (flappy.y_velocity > 0) flappy.y_velocity = 0;
             flappy.y_velocity -= flappy.impulse;
         }
     }
@@ -79,12 +82,19 @@ class Pipe {
     Collision() {
         if (flappy.x + flappy.size >= this.x - this.width / 2 && flappy.x - flappy.size <= this.x + this.width / 2) {
             //If is in the x range of the pipe
-
+            flappy.in_range = true;
             if (flappy.y - flappy.size < this.y - this.gap / 2 || flappy.y + flappy.size > this.y + this.gap / 2) {
                 //If is not in the middle of the pipe
                 flappy.gameover = true;
             }
 
+        }
+        else {
+            if (flappy.in_range) {
+                console.log('false');
+                flappy.in_range = false;
+                flappy.score++;
+            }
         }
     }
 }
@@ -99,6 +109,12 @@ function DrawMain() {
     context.fillRect(0, skyline, w_canvas, h_canvas - skyline);
 }
 
+function DrawScore() {
+    context.font = '25px Arial'
+    context.fillStyle = "#ffffff";
+    context.fillText("Score: " + flappy.score, w_canvas - 200, 40);
+}
+
 function CreatePipes() {
     if (pipe.pipes[pipe.pipes.length - 1].x < w_canvas - pipe.pipe_distance) {
 
@@ -110,7 +126,7 @@ function Restart(e) {
     if (e.keyCode == 13) {
         flappy.y = h_canvas / 2;
         flappy.y_velocity = 0;
-        flappy.score = 
+        flappy.score = 0;
         flappy.gameover = false;
 
         pipe.pipes = [];
@@ -136,17 +152,16 @@ function main() {
             flappy.Draw();
             flappy.Gravity();
 
-            for (let a_pipe of pipe.pipes) {
-                a_pipe.Collision();
-            }
+            pipe.pipes[0].Collision();
         }
         else {
-            console.log('should be printing');
             context.fillStyle = "#ffffff";
             context.font = "25px Arial";
             let width = context.measureText(flappy.gameover_text).width;
             context.fillText(flappy.gameover_text, w_canvas / 2 - width / 2, h_canvas / 2);
         }
+
+        DrawScore();
 
     }, timeout)
 }
