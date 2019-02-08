@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="../main.css">
         <title>JSGames</title>
 
         <style>
@@ -35,19 +35,20 @@
         </div>
             
         <?php
-            $name = $_POST['name'];
-            $message = $_POST['message'];
-            $date = (date("Y-m-d h:i:sa"));
+            $name = $_POST['name'] . "\n";
+            $message = $_POST['message'] . "\n";
+            $date = (date("Y-m-d h:i:sa")) . "\n";
 
-            $file_suggestions = fopen("../data/suggestions.txt");
+            $file_suggestions = fopen("../data/suggestions.txt", "a");
 
             fwrite($file_suggestions, $name . $date);
             fwrite($file_suggestions, $message);
+            fwrite($file_suggestions, '///////');
             
             fclose($file_suggestions);
         ?>
 
-        <p>Your suggestion has been ackonwledged. Thank you for your contribution</p>
+        <p>Your suggestion has been ackonwledged. Thank you for your contribution.</p>
         <a href="index.html">
     </body>
 </html>

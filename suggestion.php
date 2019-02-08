@@ -6,17 +6,6 @@
         <link rel="stylesheet" href="main.css">
         <title>JSGames</title>
 
-        <style>
-            form{
-                float:left;
-            }
-
-            form input{
-                float:left;
-            }
-
-
-    </style>
     </head>
     <body>
         <div class="vertical-menu">
