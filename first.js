@@ -312,35 +312,35 @@ class obs {
 
 	}
 
-	obsFunction(){} //Empty function
+	obsFunction() { } //Empty function
 
 }
 
-class checkpoint extends obs{
-	constructor(x, y, width, height, color){
+class checkpoint extends obs {
+	constructor(x, y, width, height, color) {
 		super(x, y, width, height, color);
 		//console.log("created a checkpoitn");
 	}
 
-	obsFunction(){
+	obsFunction() {
 
-		if(this.collision){ //If the player it the portal
+		if (this.collision) { //If the player it the portal
 			passLevel();
 		}
 	}
 }
 
-class restarter extends obs{
-	constructor(x, y, width, height, color){
+class restarter extends obs {
+	constructor(x, y, width, height, color) {
 		super(x, y, width, height, color = "red");
-		
+
 	}
 
-	obsFunction(){
+	obsFunction() {
 
-		if(this.collision){
-			rectangle.x = w_canvas/10;
-			rectangle.y = h_canvas/4 * 3; //Don't want it to fall from the top;
+		if (this.collision) {
+			rectangle.x = w_canvas / 10;
+			rectangle.y = h_canvas / 4 * 3; //Don't want it to fall from the top;
 		}
 	}
 }
@@ -413,36 +413,25 @@ function GetObstacles() {
 	switch (level) {
 
 		case 0:
-			for (var i = 0; i < 5; i++) {
-				obsArray.push(new obs(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));
-			}
-			obsArray.push(new checkpoint(600, 120, 15, 76, "grey"));
-
+			Level0();
 			break;
 
 		//Add new levels here
 		case 1:
-		obsArray.push(new obs(100, 300, 30, 400));
-		obsArray.push(new obs(100, 0, 30, 200));
-		obsArray.push(new obs(200, 200, 50, 20));
-		obsArray.push(new obs(300, 100, 50, 20));
-		obsArray.push(new restarter(150, 400, 200, 20));
-		obsArray.push(new restarter(350, 250, 100, 20));
-		obsArray.push(new restarter(500, 250, 100, 20));
-		obsArray.push( new checkpoint(600, 350, 15, 70, "grey"));
+			Level1();
 			break;
-		
+
 		default:
-		obsArray.push(new obs(0,0,10,10));
+			obsArray.push(new obs(0, 0, 10, 10));
 			break;
 	}
 }
 
-function passLevel(){
-	level ++;
+function passLevel() {
+	level++;
 	GetObstacles();
-	rectangle.x = w_canvas/10;
-	rectangle.y = rectangle.y = h_canvas/4 * 3; //Don't want it to fall from the top;;
+	rectangle.x = w_canvas / 10;
+	rectangle.y = rectangle.y = h_canvas / 4 * 3; //Don't want it to fall from the top;;
 }
 
 loop = function () {
