@@ -1,3 +1,23 @@
+function GetObstacles() {
+	//obstacles per level
+	obsArray = [];
+	switch (level) {
+
+		case 0:
+			Level0();
+			break;
+
+		//Add new levels here
+		case 1:
+			Level1();
+			break;
+
+		default:
+			obsArray.push(new obs(0, 0, 10, 10));
+			break;
+	}
+}
+
 function Level0() {
     for (var i = 0; i < 5; i++) {
         obsArray.push(new obs(w_canvas / 5.4 + 140 * i, h_canvas / 1.3 - 50 * i, 100, 30, "#af4112"));

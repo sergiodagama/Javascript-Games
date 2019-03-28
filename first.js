@@ -407,26 +407,6 @@ function Gravity() {
 	rectangle.y_velocity += 1.5;
 }
 
-function GetObstacles() {
-	//obstacles per level
-	obsArray = [];
-	switch (level) {
-
-		case 0:
-			Level0();
-			break;
-
-		//Add new levels here
-		case 1:
-			Level1();
-			break;
-
-		default:
-			obsArray.push(new obs(0, 0, 10, 10));
-			break;
-	}
-}
-
 function passLevel() {
 	level++;
 	GetObstacles();
