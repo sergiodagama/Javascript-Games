@@ -317,8 +317,9 @@ class obs {
 }
 
 class checkpoint extends obs {
-	constructor(x, y, width, height, color) {
-		super(x, y, width, height, color);
+	constructor(x, y, width, height) {
+		super(x, y, width, height);
+		this.color = "grey";
 		//console.log("created a checkpoitn");
 	}
 
