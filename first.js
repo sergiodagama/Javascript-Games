@@ -389,7 +389,7 @@ function Movement_Friction_Jumping() {
 }
 
 function DrawMain() {
-	//drawing the main scenario
+	//drawing the main scenario	
 	context.fillStyle = "#202020";
 	context.fillRect(0, 0, w_canvas, h_canvas);
 	context.fillStyle = "#ff0000"; //hex for red
